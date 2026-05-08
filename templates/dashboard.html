@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard TK Tadika Puri</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static',
+    filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h2>
+        Dashboard TK Tadika Puri
+    </h2>
+
+    <center>
+
+        <h3>
+
+            Selamat Datang,
+            {{ nama }}
+
+        </h3>
+
+        <p style="color:white;">
+
+            Penerimaan Peserta Didik Baru (PPDB)
+
+        </p>
+
+    </center>
+
+    <!-- MENU -->
+    <div class="menu">
+
+        <a href="/pendaftaran">
+
+    📝 Form Pendaftaran
+
+</a>
+
+{% if session['role'] == 'admin' %}
+
+<a href="/data_siswa">
+
+    👦 Data Siswa
+
+</a>
+
+<a href="/cetak_pdf">
+
+    📄 Cetak PDF
+
+</a>
+
+{% endif %}
+
+<a href="/logout">
+
+    🚪 Logout
+
+</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

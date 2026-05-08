@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+    <title>Data Siswa</title>
+    <head>
+
+    <title>Login TK Tadika Puri</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h2>📚 Data Siswa TK Tadika Puri</h2>
+
+    <div class="table-container">
+        <div style="overflow-x:auto;">
+
+        <table>
+
+    <thead>
+
+        <tr>
+
+            <th>Foto</th>
+            <th>Nama</th>
+            <th>Tanggal Lahir</th>
+            <th>JK</th>
+            <th>Alamat</th>
+            <th>Status</th>
+            <th>Aksi</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for s in siswa %}
+
+        <tr>
+
+            <!-- FOTO -->
+            <td>
+
+                {% if s[29] %}
+
+                <img src="{{ url_for('static',
+                filename='uploads/' + s[29]) }}"
+
+                width="70"
+
+                height="70"
+
+                style="
+                border-radius:12px;
+                object-fit:cover;
+                border:3px solid #4caf50;
+                ">
+
+                {% endif %}
+
+            </td>
+
+            <!-- NAMA -->
+            <td>{{ s[1] }}</td>
+
+            <!-- TANGGAL -->
+            <td>{{ s[4] }}</td>
+
+            <!-- JK -->
+            <td>{{ s[5] }}</td>
+
+            <!-- ALAMAT -->
+            <td>{{ s[8] }}</td>
+
+            <!-- STATUS -->
+            <td>
+
+                {% if s[30] == 'Diterima' %}
+
+                    <span class="status-terima">
+
+                        Diterima
+
+                    </span>
+
+                {% elif s[30] == 'Ditolak' %}
+
+                    <span class="status-tolak">
+
+                        Ditolak
+
+                    </span>
+
+                {% else %}
+
+                    <span class="status-menunggu">
+
+                        Menunggu
+
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+            <!-- AKSI -->
+            <td>
+
+                <div class="aksi-inline">
+
+                    <a href="/verifikasi/{{ s[0] }}/Diterima"
+                    class="btn-terima">
+
+                        ✔
+
+                    </a>
+
+                    <a href="/verifikasi/{{ s[0] }}/Ditolak"
+                    class="btn-tolak">
+
+                        ✖
+
+                    </a>
+
+                    <a href="/edit_siswa/{{ s[0] }}"
+                    class="btn-edit-mini">
+
+                        Edit
+
+                    </a>
+
+                    <a href="/hapus_siswa/{{ s[0] }}"
+                    class="btn-hapus-mini">
+
+                        Hapus
+
+                    </a>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+            </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
