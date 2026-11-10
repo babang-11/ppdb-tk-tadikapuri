@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pembayaran PPDB</title>
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="payment-box">
+
+    <h1>Pembayaran PPDB</h1>
+    <h3>TK Tadika Puri</h3>
+    <hr>
+
+    <!-- ✅ NOTIF -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div style="
+            background:#f8d7da;
+            color:#721c24;
+            padding:10px;
+            border-radius:8px;
+            margin-bottom:15px;
+            text-align:center;
+        ">
+            {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <p>Biaya Pendaftaran</p>
+    <h2 class="harga">Rp 250.000</h2>
+
+    <div class="rekening-box">
+        <h3>Transfer Ke</h3>
+        <p>
+            Bank BCA<br>
+            1234567890<br>
+            a.n TK Tadika Puri
+        </p>
+    </div>
+
+    <!-- ✅ FORM -->
+    <form method="POST" enctype="multipart/form-data">
+
+        <label>Upload Bukti Pembayaran</label>
+        <br><br>
+
+        <!-- VALIDASI FILE -->
+        <input type="file"
+               name="bukti"
+               accept="image/png, image/jpeg"
+               required>
+
+        <br><br>
+
+        <button type="submit" class="btn-bayar">
+            Kirim Bukti Pembayaran
+        </button>
+
+    </form>
+
+</div>
+
+<!-- ✅ AUTO HILANG NOTIF -->
+<script>
+setTimeout(() => {
+    const notif = document.querySelector('div[style]');
+    if (notif) notif.style.display = 'none';
+}, 3000);
+</script>
+
+</body>
+</html>

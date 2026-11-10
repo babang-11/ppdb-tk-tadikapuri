@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pembayaran</title>
+</head>
+<body>
+
+    <h2>Pembayaran Pendaftaran</h2>
+
+    <!-- NOTIF -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for msg in messages %}
+                    <li>{{ msg }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <p>Silakan transfer ke rekening berikut:</p>
+
+    <ul>
+        <li>Bank: BCA</li>
+        <li>No Rek: 1234567890</li>
+        <li>Atas Nama: TK Contoh</li>
+    </ul>
+
+    <hr>
+
+    <h3>Upload Bukti Transfer</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="bukti" required>
+        <br><br>
+        <button type="submit">Kirim Bukti</button>
+    </form>
+
+</body>
+</html>

@@ -1,190 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Pendaftaran PPDB</title>
-    <head>
-
-    <title>Login TK Tadika Puri</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}">
-
-</head>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
-
 <div class="login-box">
-
     <h2>🎈 Form Pendaftaran PPDB ☀️</h2>
 
-    <form method="POST"
-    enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
 
         <!-- IDENTITAS SISWA -->
         <h3>👦 Identitas Siswa</h3>
 
-        <input type="text"
-        name="nama_siswa"
-        placeholder="Nama Lengkap"
-        required>
+        <input type="text" name="nama_lengkap" placeholder="Nama Lengkap" required>
 
-        <input type="text"
-        name="nik"
-        placeholder="NIK"
-        required>
+        <input type="text" name="nama_panggilan" placeholder="Nama Panggilan">
 
-        <input type="text"
-        name="tempat_lahir"
-        placeholder="Tempat Lahir"
-        required>
+        <input type="text" name="tempat_lahir" placeholder="Tempat Lahir" required>
 
-        <input type="date"
-        name="tanggal_lahir"
-        required>
+        <input type="date" name="tanggal_lahir" id="tgl_lahir" required>
 
-        <select name="jenis_kelamin">
+        <input type="text" id="usia" placeholder="Usia (otomatis)" readonly>
 
+        <select name="jenis_kelamin" required>
+            <option value="">Pilih Jenis Kelamin</option>
             <option>Laki-laki</option>
             <option>Perempuan</option>
-
         </select>
 
-        <input type="text"
-        name="agama"
-        placeholder="Agama">
+        <input type="text" name="agama" placeholder="Agama">
 
-        <input type="text"
-        name="kewarganegaraan"
-        placeholder="Kewarganegaraan">
+        <input type="number" name="anak_ke" placeholder="Anak ke">
 
-        <textarea name="alamat"
-        placeholder="Alamat Lengkap"></textarea>
+        <!-- RADIO BUTTON -->
+        <p>Tinggal bersama:</p>
+        <label><input type="radio" name="tinggal" value="Ayah & Ibu"> Ayah & Ibu</label>
+        <label><input type="radio" name="tinggal" value="Ayah"> Ayah</label>
+        <label><input type="radio" name="tinggal" value="Ibu"> Ibu</label>
 
-        <input type="text"
-        name="tinggal_bersama"
-        placeholder="Tinggal Bersama">
+        <textarea name="alamat" placeholder="Alamat Lengkap"></textarea>
 
-        <input type="number"
-        name="anak_ke"
-        placeholder="Anak Ke">
+        <!-- DATA PERIODIK (dipindah ke sini sesuai revisi) -->
+        <h3>📊 Data Periodik</h3>
 
-        <input type="number"
-        name="usia"
-        placeholder="Usia">
+        <input type="number" name="tinggi_badan" placeholder="Tinggi Badan (cm)">
+        <input type="number" name="berat_badan" placeholder="Berat Badan (kg)">
+        <input type="number" name="jumlah_saudara" placeholder="Jumlah Saudara">
 
-        <input type="text"
-        name="no_hp"
-        placeholder="Nomor HP">
+        <!-- UPLOAD BERKAS -->
+        <h3>📂 Upload Berkas</h3>
 
-        <!-- FOTO -->
-        <h3>📸 Upload Foto Siswa</h3>
+        <label>Upload KK:</label>
+        <input type="file" name="kk">
 
-        <input type="file"
-        name="foto"
-        required>
+        <label>Upload Akta Lahir:</label>
+        <input type="file" name="akta">
 
-        <!-- DATA AYAH -->
+        <label>Upload Foto Siswa:</label>
+        <input type="file" name="foto">
+
+        <!-- DATA ORANG TUA -->
         <h3>👨 Data Ayah</h3>
 
-        <input type="text"
-        name="nama_ayah"
-        placeholder="Nama Ayah">
+        <input type="text" name="nama_ayah" placeholder="Nama Ayah">
+        <input type="text" name="pekerjaan_ayah" placeholder="Pekerjaan Ayah">
 
-        <input type="text"
-        name="nik_ayah"
-        placeholder="NIK Ayah">
-
-        <input type="text"
-        name="pendidikan_ayah"
-        placeholder="Pendidikan Ayah">
-
-        <input type="text"
-        name="pekerjaan_ayah"
-        placeholder="Pekerjaan Ayah">
-
-        <!-- DATA IBU -->
         <h3>👩 Data Ibu</h3>
 
-        <input type="text"
-        name="nama_ibu"
-        placeholder="Nama Ibu">
+        <input type="text" name="nama_ibu" placeholder="Nama Ibu">
+        <input type="text" name="pekerjaan_ibu" placeholder="Pekerjaan Ibu">
 
-        <input type="text"
-        name="nik_ibu"
-        placeholder="NIK Ibu">
+        <!-- PEMBAYARAN -->
+        <h3>💰 Pembayaran</h3>
 
-        <input type="text"
-        name="pendidikan_ibu"
-        placeholder="Pendidikan Ibu">
-
-        <input type="text"
-        name="pekerjaan_ibu"
-        placeholder="Pekerjaan Ibu">
-
-        <!-- DATA PERIODIK -->
-        <h3>📚 Data Periodik</h3>
-
-        <input type="number"
-        name="tinggi_badan"
-        placeholder="Tinggi Badan">
-
-        <input type="number"
-        name="berat_badan"
-        placeholder="Berat Badan">
-
-        <input type="text"
-        name="jarak_tempuh"
-        placeholder="Jarak Tempuh">
-
-        <input type="number"
-        name="jumlah_saudara"
-        placeholder="Jumlah Saudara">
-
-        <!-- REGISTRASI -->
-        <h3>📝 Registrasi</h3>
-
-        <select name="jenis_pendaftaran">
-
-            <option>Siswa Baru</option>
-            <option>Pindahan</option>
-
+        <select name="jenis_biaya">
+            <option value="formulir">Biaya Formulir</option>
+            <option value="pendaftaran">Biaya Pendaftaran</option>
         </select>
 
-        <input type="date"
-        name="tgl_masuk">
-
-        <input type="text"
-        name="no_induk"
-        placeholder="No Induk Siswa">
-
-        <select name="rombel">
-
-
-            <option>TK A</option>
-            <option>TK B</option>
-            <option>Kelompok A</option>
-            <option>Kelompok B</option>
-
-        </select>
+        <!-- AUTO TANGGAL -->
+        <input type="hidden" name="tanggal_daftar" id="tanggal_daftar">
 
         <button type="submit">
-
             💾 Simpan Pendaftaran
-
         </button>
 
     </form>
-
 </div>
+
+<!-- SCRIPT USIA OTOMATIS -->
+<script>
+document.getElementById("tgl_lahir").addEventListener("change", function() {
+    let lahir = new Date(this.value);
+    let today = new Date();
+
+    let usia = today.getFullYear() - lahir.getFullYear();
+    let m = today.getMonth() - lahir.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < lahir.getDate())) {
+        usia--;
+    }
+
+    document.getElementById("usia").value = usia + " tahun";
+});
+
+// tanggal otomatis
+document.getElementById("tanggal_daftar").value = new Date().toISOString().split('T')[0];
+</script>
 
 </body>
 </html>

@@ -1,78 +1,146 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
     <title>Dashboard TK Tadika Puri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet"
-    href="{{ url_for('static',
-    filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
+    <style>
+        .status-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-lunas {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-menunggu {
+            background: #ffc107;
+            color: black;
+        }
+
+        .status-belum {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-bayar {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-bayar:hover {
+            background: #e60000;
+        }
+
+        .menu a {
+            display: block;
+            margin: 8px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="login-box">
 
-    <h2>
-        Dashboard TK Tadika Puri
-    </h2>
+    <h2>Dashboard TK Tadika Puri</h2>
+
+    <!-- FLASH -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div id="notif" style="
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            text-align:center;">
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
 
     <center>
-
-        <h3>
-
-            Selamat Datang,
-            {{ nama }}
-
-        </h3>
-
-        <p style="color:white;">
-
-            Penerimaan Peserta Didik Baru (PPDB)
-
-        </p>
-
+        <h3>Selamat Datang, {{ nama }}</h3>
+        <p style="color:white;">PPDB TK Tadika Puri</p>
     </center>
+
+    <!-- STATUS -->
+    {% if status == 'Lunas' %}
+        <div class="status-box status-lunas">
+            ✅ Pembayaran Lunas
+        </div>
+    {% elif status == 'Menunggu Verifikasi' %}
+        <div class="status-box status-menunggu">
+            ⏳ Menunggu Verifikasi Admin
+        </div>
+    {% else %}
+        <div class="status-box status-belum">
+            ❌ Belum Bayar
+        </div>
+    {% endif %}
+
+    <!-- BUTTON BAYAR -->
+    {% if status == 'Belum Bayar' %}
+    <center>
+        <a href="{{ url_for('pembayaran') }}">
+            <button class="btn-bayar">💳 Bayar Sekarang</button>
+        </a>
+    </center>
+    {% endif %}
 
     <!-- MENU -->
     <div class="menu">
 
-        <a href="/pendaftaran">
+        {% if session.get('role') != 'admin' %}
+            <a href="/pendaftaran">📝 Form Pendaftaran</a>
+            <a href="/pembayaran">💳 Pembayaran</a>
+        {% endif %}
 
-    📝 Form Pendaftaran
+        {% if session.get('role') == 'admin' %}
+            <a href="/data_siswa">👦 Data Siswa</a>
+            <a href="/data_pembayaran">💳 Data Pembayaran</a>
+            <a href="/cetak_pdf">📄 Cetak PDF</a>
+        {% endif %}
 
-</a>
-
-{% if session['role'] == 'admin' %}
-
-<a href="/data_siswa">
-
-    👦 Data Siswa
-
-</a>
-
-<a href="/cetak_pdf">
-
-    📄 Cetak PDF
-
-</a>
-
-{% endif %}
-
-<a href="/logout">
-
-    🚪 Logout
-
-</a>
-
+        <a href="/logout">🚪 Logout</a>
     </div>
 
 </div>
+
+<!-- AUTO HILANG NOTIF -->
+<script>
+setTimeout(() => {
+  const notif = document.getElementById('notif');
+  if (notif) notif.style.display = 'none';
+}, 3000);
+</script>
 
 </body>
 </html>

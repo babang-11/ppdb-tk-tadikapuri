@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Status Pembayaran</title>
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="payment-box">
+    <h2>Status Pembayaran</h2>
+    <h3>
+        {{ status }}
+    </h3>
+    <br>
+    <a href="/"
+    class="btn-bayar">
+        Kembali ke Home
+    </a>
+</div>
+</body>
+</html>

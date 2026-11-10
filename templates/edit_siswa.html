@@ -5,56 +5,35 @@
 content="width=device-width, initial-scale=1.0">
     <title>Edit Siswa</title>
     <head>
-
     <title>Login TK Tadika Puri</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet"
     href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
-
     <link rel="stylesheet"
     href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
-
 <body>
-
 <div class="login-box">
-
     <h2>Edit Data Siswa</h2>
-
     <form method="POST">
-
         <input type="text"
         name="nama_siswa"
         value="{{ siswa[1] }}">
-
         <input type="date"
         name="tanggal_lahir"
         value="{{ siswa[2] }}">
-
         <select name="jenis_kelamin">
-
             <option>{{ siswa[3] }}</option>
-
             <option>Laki-laki</option>
             <option>Perempuan</option>
-
         </select>
-
         <textarea
         name="alamat">{{ siswa[4] }}</textarea>
-
         <button type="submit">
             Update
         </button>
-
     </form>
-
 </div>
-
 </body>
 </html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+    <title>PPDB TK Tadika Puri</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo-navbar">
+        <img src="/static/image/logo-transparent.png"
+        class="logo-sekolah">
+
+        <h2>TK Tadika Puri</h2>
+    </div>
+
+    <div class="nav-menu">
+
+        <a href="/">Home</a>
+
+        {% if 'login' in session %}
+
+        <a href="/dashboard">Dashboard</a>
+
+        <div class="profile-box">
+
+            {% if session.get('foto') %}
+            <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}"
+            class="profile-img">
+            {% else %}
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            class="profile-img">
+            {% endif %}
+
+            <span>{{ session['email'] }}</span>
+
+            <a href="/profile" class="profile-action">
+                Edit Profile
+            </a>
+
+            <a href="/logout" class="logout-action">
+                Logout
+            </a>
+
+        </div>
+
+        {% else %}
+
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>PPDB TK Tadika Puri</h1>
+
+        <p>
+            Membangun generasi cerdas,
+            kreatif, dan berkarakter.
+        </p>
+
+        {% if 'login' in session %}
+
+            {% if sudah_bayar %}
+
+            <a href="/status_pembayaran"
+            class="btn-daftar">
+                Cek Status Pembayaran
+            </a>
+
+            {% else %}
+
+            <a href="/pendaftaran"
+            class="btn-daftar">
+                Lanjutkan Pendaftaran
+            </a>
+
+            {% endif %}
+
+        {% else %}
+
+        <a href="/register"
+        class="btn-daftar">
+            Daftar Akun PPDB
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+<section class="tentang">
+    <h2>Tentang TK Tadika Puri</h2>
+
+    <p>
+        TK TADIKA PURI merupakan sekolah
+        jenjang TK swasta yang berada di
+        wilayah Sukmajaya, Kota Depok,
+        Jawa Barat. Sekolah ini berdiri sejak
+        4 Mei 1998 dan berada di bawah
+        naungan Kementerian Pendidikan
+        dan Kebudayaan.
+    </p>
+</section>
+
+<section class="tentang">
+    <h2>Akreditasi Sekolah</h2>
+
+    <p>
+        TK TADIKA PURI telah terakreditasi
+        <b>A</b> dengan Nomor SK:
+        07/120/BAP-SM/XII/2006
+        pada tanggal 30 Desember 2006.
+    </p>
+</section>
+
+<section class="tentang">
+    <h2>Alamat Sekolah</h2>
+
+    <p>
+        📍 GRIYA DEPOK ASRI BLOK C2/6,
+        Mekar Jaya, Kec. Sukmajaya,
+        Kota Depok, Jawa Barat
+    </p>
+</section>
+
+<section class="tentang">
+    <h2>Kontak Sekolah</h2>
+
+    <p>
+        ☎️ 0217709548
+        <br><br>
+        📧 tktadikapuriad@gmail.com
+    </p>
+</section>
+
+<footer>
+    © 2026 TK Tadika Puri
+</footer>
+
+</body>
+</html>

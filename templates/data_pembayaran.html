@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Pembayaran</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="table-container">
+
+    <h2>Data Pembayaran PPDB</h2>
+
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>No</th>
+            <th>Nama Siswa</th>
+            <th>Email</th>
+            <th>Bukti Bayar</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+
+        {% for p in pembayaran %}
+        <tr>
+            <td>{{ loop.index }}</td>
+
+            <!-- nama dari join -->
+            <td>{{ p[2] }}</td>
+
+            <!-- email -->
+            <td>{{ p[1] }}</td>
+
+            <!-- gambar bukti -->
+            <td>
+                {% if p[3] %}
+                    <a href="{{ url_for('static', filename='bukti/' + p[3]) }}" target="_blank">
+                        <img src="{{ url_for('static', filename='bukti/' + p[3]) }}" width="80">
+                    </a>
+                {% else %}
+                    Tidak ada
+                {% endif %}
+            </td>
+
+            <!-- status -->
+            <td>
+                {% if p[4] == 'Lunas' %}
+                    <span style="color:green; font-weight:bold;">LUNAS</span>
+                {% else %}
+                    <span style="color:orange;">{{ p[4] }}</span>
+                {% endif %}
+            </td>
+
+            <!-- tombol aksi -->
+            <td>
+                {% if p[4] != 'Lunas' %}
+                    <a href="/acc/{{ p[0] }}"
+                       style="background:green;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;">
+                        ACC
+                    </a>
+                {% else %}
+                    ✔
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <br>
+    <a href="/dashboard">Kembali ke Dashboard</a>
+
+</div>
+
+</body>
+</html>
