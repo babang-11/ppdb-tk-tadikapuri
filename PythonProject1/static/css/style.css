@@ -1,0 +1,606 @@
+/* ================= 1. RESET & GENERAL ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f4f8fb;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+/* ================= 2. NAVBAR ================= */
+.navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 12px rgba(2, 136, 209, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 14px 0;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-navbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #0288d1;
+}
+
+.logo-sekolah {
+  height: 42px;
+  width: auto;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #0288d1;
+}
+
+.btn-nav-primary {
+  background-color: #0288d1;
+  color: #ffffff;
+  padding: 9px 22px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(2, 136, 209, 0.2);
+}
+
+.btn-nav-primary:hover {
+  background-color: #01579b;
+  transform: translateY(-1px);
+}
+
+.profile-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0288d1;
+}
+
+.btn-logout-nav {
+  color: #d32f2f;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* ================= 3. HERO SECTION ================= */
+.hero {
+  background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%);
+  padding: 70px 24px;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  width: 100%;
+}
+
+.hero-content {
+  flex: 1;
+  color: #ffffff;
+}
+
+.hero-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 20px;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin-bottom: 32px;
+  max-width: 540px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-smm {
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.btn-smm-white {
+  background-color: #ffffff;
+  color: #0288d1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.btn-smm-white:hover {
+  background-color: #e1f5fe;
+  color: #01579b;
+  transform: translateY(-2px);
+}
+
+.btn-smm-outline {
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+}
+
+.btn-smm-outline:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+}
+
+.btn-smm-blue {
+  background-color: #0288d1;
+  color: #ffffff;
+}
+
+.btn-smm-blue:hover {
+  background-color: #01579b;
+}
+
+.hero-image-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 28px;
+  box-shadow: 0 20px 40px rgba(1, 87, 155, 0.25);
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ================= 4. SEKILAS TENTANG (PROFILE SMM) ================= */
+.about-section {
+  padding: 90px 24px;
+  background-color: #ffffff;
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+.about-image {
+  flex: 1;
+}
+
+.about-image img {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 24px;
+  box-shadow: 0 15px 30px rgba(2, 136, 209, 0.12);
+}
+
+.about-content {
+  flex: 1;
+}
+
+.section-subtitle {
+  color: #0288d1;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.about-title {
+  font-size: 2.3rem;
+  color: #01579b;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.about-text {
+  color: #64748b;
+  font-size: 1.05rem;
+  margin-bottom: 28px;
+  line-height: 1.7;
+}
+
+/* ================= 5. PROGRAM CARDS (SMM) ================= */
+.program-section {
+  padding: 90px 24px;
+  background-color: #f4f8fb;
+}
+
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #01579b;
+  margin-bottom: 48px;
+}
+
+.program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.program-card {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 10px 25px rgba(2, 136, 209, 0.08);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-blue { border-top: 6px solid #0288d1; }
+.card-cyan { border-top: 6px solid #29b6f6; }
+
+.program-img-box {
+  width: 100%;
+  height: 180px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.program-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.program-card h3 {
+  font-size: 1.35rem;
+  color: #01579b;
+  margin-bottom: 16px;
+}
+
+.program-list {
+  list-style: none;
+  margin-bottom: 28px;
+  flex: 1;
+}
+
+.program-list li {
+  padding: 8px 0;
+  color: #475569;
+  font-size: 0.95rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.btn-program {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  background-color: #0288d1;
+  color: #ffffff;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-program:hover {
+  background-color: #01579b;
+}
+
+/* ================= 6. FORM PENDAFTARAN SMM ================= */
+/* ================= FORM PENDAFTARAN ALA SMM ================= */
+.form-section {
+  background-color: #f1f3f9;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.form-container {
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.form-subtitle {
+  color: #0288d1;
+  font-family: 'Poppins', cursive, sans-serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-title {
+  color: #0d1b2a;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 32px;
+}
+
+.form-card {
+  background-color: #ffffff;
+  padding: 40px 36px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* INPUT & SELECT BERSAMA FLOATING LABEL */
+.smm-input-group {
+  position: relative;
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.smm-input-group input,
+.smm-input-group select {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  outline: none;
+  background: transparent;
+  transition: border-color 0.2s ease;
+  color: #1f2937;
+  appearance: none; /* Merapikan panah select */
+}
+
+.smm-input-group label {
+  position: absolute;
+  left: 16px;
+  top: -10px;
+  background-color: #ffffff;
+  padding: 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4b5563;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.smm-input-group input:focus,
+.smm-input-group select:focus {
+  border-color: #0288d1;
+}
+
+.smm-input-group input:focus + label,
+.smm-input-group select:focus + label {
+  color: #0288d1;
+}
+
+/* CHECKBOX & BUTTON */
+.smm-checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.smm-checkbox-group input {
+  margin-top: 3px;
+  accent-color: #0288d1;
+}
+
+.btn-smm-submit {
+  width: 100%;
+  padding: 14px;
+  background-color: #0288d1;
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-smm-submit:hover {
+  background-color: #01579b;
+  transform: translateY(-2px);
+}
+
+.form-footer-text {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.form-footer-text a {
+  color: #0288d1;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ================= 7. KEUNGGULAN SEKOLAH ================= */
+.info-section {
+  padding: 90px 24px;
+  background-color: #ffffff;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+.info-card {
+  background-color: #f8fafc;
+  padding: 36px 26px;
+  border-radius: 22px;
+  border-top: 5px solid #0288d1;
+  box-shadow: 0 6px 20px rgba(2, 136, 209, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(2, 136, 209, 0.12);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.info-card h3 {
+  font-size: 1.25rem;
+  color: #01579b;
+  margin-bottom: 12px;
+}
+
+.info-card p {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* ================= 8. FOOTER ================= */
+.footer {
+  background-color: #01579b;
+  color: #e0f7fa;
+  padding: 60px 24px 30px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+}
+
+/* LOGO FOOTER SEJAJAR TEKS */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.3rem; /* Ukuran font disamakan */
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.footer-logo-img {
+  height: 28px; /* Ukuran logo pas dengan tinggi huruf */
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* Membuat logo putih bersih agar kontras dengan background biru */
+}
+
+.brand-col p {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+
+.copyright {
+  font-size: 0.8rem !important;
+  opacity: 0.6 !important;
+}
+
+.footer-col h4 {
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.footer-col a {
+  display: block;
+  color: #e0f7fa;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.footer-col a:hover {
+  opacity: 1;
+}
+
+.footer-col p {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  opacity: 0.85;
+}
+
+/* RESPONSIVE LAYAR HP */
+@media (max-width: 768px) {
+  .hero-container, .about-container, .footer-container {
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-title, .about-title {
+    font-size: 2rem;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+
+  .footer-logo {
+    justify-content: center;
+  }
+}

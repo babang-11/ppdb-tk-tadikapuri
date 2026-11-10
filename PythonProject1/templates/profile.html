@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+    <title>
+        Profile Pengguna
+    </title>
+    <link rel="stylesheet"
+    href="{{ url_for('static',
+    filename='css/style.css') }}">
+
+</head>
+<body>
+<div class="profile-container">
+    <div class="profile-card">
+        {% if user[6] %}
+
+<img src="{{ url_for('static',
+filename='uploads/' + user[6]) }}"
+class="profile-photo">
+
+{% else %}
+
+<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+class="profile-photo">
+
+{% endif %}
+        <h2>
+            Profile Pengguna
+        </h2>
+
+        <form method="POST"
+enctype="multipart/form-data">
+
+            <input type="text"
+            name="nama"
+            value="{{ user[1] }}"
+            placeholder="Nama">
+
+            <input type="email"
+            value="{{ user[2] }}"
+            readonly>
+
+            <input type="text"
+            name="no_hp"
+            value="{{ user[4] }}"
+            placeholder="No HP">
+
+            <input type="file"
+                   name="foto">
+
+            <button type="submit">
+                Simpan Perubahan
+            </button>
+
+        </form>
+
+        <a href="/"
+        class="btn-kembali">
+
+            Kembali ke Home
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pembayaran - Admin TK Tadika Puri</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR ADMIN */
+        .sidebar { width: 260px; background-color: #0f172a; color: #ffffff; padding: 24px 16px; display: flex; flex-direction: column; }
+        .sidebar-brand { font-size: 1.25rem; font-weight: 700; margin-bottom: 32px; padding: 0 12px; color: #38bdf8; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #94a3b8; text-decoration: none; font-weight: 500; border-radius: 12px; transition: all 0.2s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background-color: #0288d1; color: #ffffff; }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; padding: 36px 40px; }
+        .header-title { margin-bottom: 28px; }
+        .header-title h1 { font-size: 1.8rem; color: #01579b; font-weight: 700; }
+        .header-title p { color: #64748b; font-size: 0.95rem; }
+
+        /* TABEL */
+        .table-card { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #01579b; color: #ffffff; padding: 16px; font-size: 0.9rem; font-weight: 600; }
+        td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; color: #334155; }
+        tr:hover { background-color: #f8fafc; }
+
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
+        .badge-pending { background-color: #fef3c7; color: #b45309; }
+        .badge-success { background-color: #dcfce7; color: #15803d; }
+        .badge-danger { background-color: #fee2e2; color: #b91c1c; }
+
+        .btn-acc { padding: 6px 14px; background-color: #16a34a; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
+        .btn-acc:hover { background-color: #15803d; }
+        .btn-bukti { color: #0288d1; font-weight: 600; text-decoration: none; }
+        .btn-bukti:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">Panel Admin</div>
+        <ul class="sidebar-menu">
+            <li><a href="/admin_dashboard">📊 Dashboard</a></li>
+            <li><a href="/data_siswa">👥 Data Siswa</a></li>
+            <li><a href="/data_pembayaran" class="active">💳 Data Pembayaran</a></li>
+            <li><a href="/cetak_pdf" target="_blank">📄 Cetak PDF</a></li>
+            <li><a href="/">🏠 Halaman Utama</a></li>
+            <li style="margin-top: auto;"><a href="/logout" style="color: #fca5a5;">🚪 Logout</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header-title">
+            <h1>Verifikasi Pembayaran PPDB</h1>
+            <p>Daftar bukti transfer yang dikirim oleh calon siswa untuk diverifikasi.</p>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Email Pendaftar</th>
+                        <th>Foto Bukti Bayar</th>
+                        <th>Status Pembayaran</th>
+                        <th>Aksi Verifikasi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pembayaran %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><b>{{ row[1] if row[1] else '-' }}</b></td>
+                        <td>
+                            {% if row[2] %}
+                            <a href="{{ url_for('static', filename='bukti/' + row[2]) }}" target="_blank" class="btn-bukti">🔍 Lihat Bukti Transfer</a>
+                            {% else %}
+                            <span style="color: #94a3b8;">Tidak ada file</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row[3] == 'Lunas' or row[3] == 'Disetujui' %}
+                                <span class="badge badge-success">Lunas / Disetujui</span>
+                            {% elif row[3] == 'Ditolak' %}
+                                <span class="badge badge-danger">Ditolak</span>
+                            {% else %}
+                                <span class="badge badge-pending">Menunggu Verifikasi</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row[3] != 'Lunas' and row[3] != 'Disetujui' %}
+                                <a href="/acc/{{ row[0] }}" class="btn-acc">✓ Setujui Pembayaran</a>
+                            {% else %}
+                                <span style="color: #16a34a; font-weight: 600; font-size: 0.85rem;">Terverifikasi</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">Belum ada data pembayaran masuk.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

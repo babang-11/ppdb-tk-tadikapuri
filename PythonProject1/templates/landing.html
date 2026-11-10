@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPDB TK Tadika Puri</title>
+
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- 1. NAVBAR -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo-navbar">
+            <img src="{{ url_for('static', filename='image/logo-transparent.png') }}" alt="Logo TK Tadika Puri" class="logo-sekolah">
+            <span>TK Tadika Puri</span>
+        </a>
+
+        <div class="nav-menu">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="#tentang" class="nav-link">Tentang Kami</a>
+            <a href="#program" class="nav-link">Program</a>
+            
+            {% if session.get('role') != 'admin' %}
+                <a href="#daftar" class="nav-link">Pendaftaran</a>
+            {% endif %}
+
+            {% if 'login' in session %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="/admin_dashboard" class="nav-link" style="color: #38bdf8; font-weight: 700;">Dashboard Admin</a>
+                {% else %}
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                {% endif %}
+
+                <div class="profile-box">
+                    {% if session.get('foto') %}
+                    <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}" class="profile-img">
+                    {% else %}
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-img">
+                    {% endif %}
+                    <a href="/logout" class="btn-logout-nav">Logout</a>
+                </div>
+            {% else %}
+                <a href="#daftar" class="btn-nav-primary">Daftar Murid Baru</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- 2. HERO SECTION -->
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Membangun Generasi Cerdas, Kreatif, dan Berkarakter
+            </h1>
+            <p class="hero-description">
+                PPDB TK Tadika Puri menghadirkan pembelajaran usia dini yang menyenangkan, interaktif, dan berfokus pada tumbuh kembang anak secara optimal.
+            </p>
+
+            <div class="hero-buttons">
+                {% if 'login' in session %}
+                    {% if session.get('role') == 'admin' %}
+                        <!-- TOMBOL KHUSUS AKUN ADMIN -->
+                        <a href="/admin_dashboard" class="btn-smm btn-smm-white">Masuk Panel Admin</a>
+                    {% else %}
+                        <!-- TOMBOL UNTUK USER BIASA -->
+                        {% if sudah_bayar %}
+                        <a href="/status_pembayaran" class="btn-smm btn-smm-white">Cek Status Pembayaran</a>
+                        {% else %}
+                        <a href="/pendaftaran" class="btn-smm btn-smm-white">Lanjutkan Pendaftaran</a>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <!-- TOMBOL SAAT BELUM LOGIN -->
+                    <a href="#daftar" class="btn-smm btn-smm-white">Daftar Akun PPDB</a>
+                    <a href="/login" class="btn-smm btn-smm-outline">Masuk / Login</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="hero-image-wrapper">
+            <img src="{{ url_for('static', filename='image/sekolah.jpeg') }}" alt="Siswa TK Tadika Puri" class="hero-img">
+        </div>
+    </div>
+</section>
+
+<!-- 3. SEKILAS TENTANG SEKOLAH (SMM PROFILE STYLE) -->
+<section class="about-section" id="tentang">
+    <div class="about-container">
+        <div class="about-image">
+            <img src="{{ url_for('static', filename='image/sekolah.jpeg') }}" alt="Kegiatan TK Tadika Puri">
+        </div>
+        <div class="about-content">
+            <p class="section-subtitle">Sekilas Tentang</p>
+            <h2 class="about-title">TK Tadika Puri</h2>
+            <p class="about-text">
+                Didirikan sejak tahun 1998, TK Tadika Puri berkoordinasi dengan Kementerian Pendidikan dan Kebudayaan untuk menghadirkan pendidikan usia dini yang ramah anak, terstruktur, serta berorientasi pada pembentukan karakter mandiri dan kreatif.
+            </p>
+            <a href="#keunggulan" class="btn-smm btn-smm-blue">Lihat Keunggulan</a>
+        </div>
+    </div>
+</section>
+
+<!-- 4. PROGRAM BELAJAR (SMM PROGRAM CARDS) -->
+<section class="program-section" id="program">
+    <div class="section-container">
+        <p class="section-subtitle">Pilihan Pembelajaran</p>
+        <h2 class="section-title">Program TK Tadika Puri</h2>
+
+        <div class="program-grid">
+            <!-- Card 1 -->
+            <div class="program-card card-blue">
+                <div class="program-img-box">
+                    <img src="{{ url_for('static', filename='image/sekolah.jpeg') }}" alt="Kelas Reguler">
+                </div>
+                <h3>Tatap Muka Reguler</h3>
+                <ul class="program-list">
+                    <li>Pertemuan 5 hari seminggu</li>
+                    <li>Ruang kelas ber-AC & area bermain aman</li>
+                    <li>Pengembangan motorik & kognitif</li>
+                    <li>Laporan perkembangan berkala</li>
+                </ul>
+                {% if session.get('role') != 'admin' %}
+                    <a href="#daftar" class="btn-program">Daftar Reguler</a>
+                {% endif %}
+            </div>
+
+            <!-- Card 2 -->
+            <div class="program-card card-cyan">
+                <div class="program-img-box">
+                    <img src="{{ url_for('static', filename='image/sekolah.jpeg') }}" alt="Kelas Kombinasi">
+                </div>
+                <h3>Kelas Interaktif & Bakat</h3>
+                <ul class="program-list">
+                    <li>Kreativitas seni & musik anak</li>
+                    <li>Pengenalan bahasa Inggris dasar</li>
+                    <li>Pendidikan agama & nilai moral</li>
+                    <li>Sertifikat & pameran karya murid</li>
+                </ul>
+                {% if session.get('role') != 'admin' %}
+                    <a href="#daftar" class="btn-program">Daftar Kelas Bakat</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. FORMULIR PENDAFTARAN AKUN PPDB (HANYA MUNCUL JIKA BUKAN ADMIN) -->
+{% if session.get('role') != 'admin' %}
+<section class="form-section" id="daftar">
+    <div class="form-container">
+        <p class="form-subtitle">Nikmati Pembelajaran Menyenangkan & Bermakna</p>
+        <h2 class="form-title">Daftar Sekarang</h2>
+
+        <div class="form-card">
+            <form action="/register" method="POST">
+                
+                <!-- 1. Nama Orang Tua -->
+                <div class="smm-input-group">
+                    <input type="text" name="nama" id="nama" placeholder=" " required>
+                    <label for="nama">Nama Orang Tua *</label>
+                </div>
+
+                <!-- 2. No WhatsApp Orang Tua -->
+                <div class="smm-input-group">
+                    <input type="tel" name="no_hp" id="no_hp" placeholder=" " required>
+                    <label for="no_hp">No WhatsApp Orang Tua *</label>
+                </div>
+
+                <!-- 3. Email Orang Tua -->
+                <div class="smm-input-group">
+                    <input type="email" name="email" id="email" placeholder=" " required>
+                    <label for="email">Email Orang Tua *</label>
+                </div>
+
+                <!-- 4. Nama Anak -->
+                <div class="smm-input-group">
+                    <input type="text" name="nama_anak" id="nama_anak" placeholder=" " required>
+                    <label for="nama_anak">Nama Anak *</label>
+                </div>
+
+                <!-- 5. Password Akun -->
+                <div class="smm-input-group">
+                    <input type="password" name="password" id="password" placeholder=" " required>
+                    <label for="password">Password Akun *</label>
+                </div>
+
+                <!-- 6. Pilih Jenjang -->
+                <div class="smm-input-group">
+                    <select name="jenjang" id="jenjang" required>
+                        <option value="" disabled selected hidden></option>
+                        <option value="Pre-Kinder">Pre-Kinder (3-4 Tahun)</option>
+                        <option value="Kinder A">Kinder A (4-5 Tahun)</option>
+                        <option value="Kinder B">Kinder B (5-6 Tahun)</option>
+                    </select>
+                    <label for="jenjang">Pilih Jenjang *</label>
+                </div>
+
+                <!-- 7. Pilih Tahun Ajaran -->
+                <div class="smm-input-group">
+                    <select name="tahun_ajaran" id="tahun_ajaran" required>
+                        <option value="" disabled selected hidden></option>
+                        <option value="2025/2026">2025/2026</option>
+                        <option value="2026/2027">2026/2027</option>
+                        <option value="2027/2028">2027/2028</option>
+                    </select>
+                    <label for="tahun_ajaran">Pilih Tahun Ajaran *</label>
+                </div>
+
+                <!-- 8. Pilih Tipe Program -->
+                <div class="smm-input-group">
+                    <select name="tipe_program" id="tipe_program" required>
+                        <option value="" disabled selected hidden></option>
+                        <option value="Tatap Muka Rutin">Tatap Muka Rutin</option>
+                        <option value="Daring Rutin">Daring Rutin</option>
+                    </select>
+                    <label for="tipe_program">Pilih Tipe Program *</label>
+                </div>
+
+                <!-- 9. Pilih Kelas -->
+                <div class="smm-input-group">
+                    <select name="pilihan_kelas" id="pilihan_kelas" required>
+                        <option value="" disabled selected hidden></option>
+                        <option value="Reguler">Reguler</option>
+                        <option value="Inklusi">Inklusi</option>
+                    </select>
+                    <label for="pilihan_kelas">Pilih Kelas *</label>
+                </div>
+
+                <!-- Checkbox Persetujuan -->
+                <div class="smm-checkbox-group">
+                    <input type="checkbox" id="persetujuan" required checked>
+                    <label for="persetujuan">Saya bersedia dikirimkan informasi pendaftaran melalui Email dan WhatsApp.</label>
+                </div>
+
+                <button type="submit" class="btn-smm-submit">Daftar Sekarang</button>
+            </form>
+
+            <p class="form-footer-text">
+                Sudah punya akun? <a href="/login">Masuk di sini</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 6. KEUNGGULAN SEKOLAH -->
+<section class="info-section" id="keunggulan">
+    <div class="section-container">
+        <p class="section-subtitle">Mengapa Memilih Kami</p>
+        <h2 class="section-title">Keunggulan TK Tadika Puri</h2>
+        <div class="card-grid">
+            <div class="info-card">
+                <div class="card-icon">🏫</div>
+                <h3>Berdiri Sejak 1998</h3>
+                <p>TK Swasta terpercaya di wilayah Sukmajaya, Depok di bawah naungan Kemendikbud.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon">⭐</div>
+                <h3>Terakreditasi A</h3>
+                <p>Terbukti berkualitas unggul berdasarkan SK: 07/120/BAP-SM/XII/2006.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-icon">📍</div>
+                <h3>Lokasi Strategis</h3>
+                <p>Griya Depok Asri Blok C2/6, Mekar Jaya, Kec. Sukmajaya, Kota Depok, Jawa Barat.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. FOOTER -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col brand-col">
+            <div class="footer-logo">
+                <img src="{{ url_for('static', filename='image/logo-transparent.png') }}" alt="Logo TK Tadika Puri" class="footer-logo-img">
+                <span>TK Tadika Puri</span>
+            </div>
+            <p>Pendidikan anak usia dini berbasis pembentukan karakter cerdas dan kreatif.</p>
+            <p class="copyright">© 2026 TK Tadika Puri. All rights reserved.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Pintasan</h4>
+            <a href="/">Home</a>
+            <a href="#tentang">Tentang Kami</a>
+            <a href="#program">Program</a>
+            {% if session.get('role') != 'admin' %}
+                <a href="#daftar">Pendaftaran</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Kontak Kami</h4>
+            <p>📍 Griya Depok Asri C2/6, Sukmajaya, Depok</p>
+            <p>☎️ 021-7709548</p>
+            <p>📧 tktadikapuriad@gmail.com</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

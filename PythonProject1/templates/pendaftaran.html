@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lengkapi Data Siswa - TK Tadika Puri</title>
+
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .pembagian-wrapper {
+            background-color: #f1f5f9;
+            min-height: 100vh;
+            padding: 50px 24px;
+        }
+
+        .form-card-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px 36px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(2, 136, 209, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .form-header h2 {
+            color: #01579b;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .form-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+
+        .section-group-title {
+            color: #0288d1;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 28px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0f2fe;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .input-box label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .input-box input, .input-box select, .input-box textarea {
+            padding: 12px 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-box input:focus, .input-box select:focus, .input-box textarea:focus {
+            border-color: #0288d1;
+            box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.12);
+        }
+
+        .file-box {
+            background-color: #f8fafc;
+            border: 1.5px dashed #0288d1;
+            padding: 16px;
+            border-radius: 14px;
+        }
+
+        .file-box input[type="file"] {
+            border: none;
+            padding: 0;
+            background: transparent;
+        }
+
+        .btn-submit-formal {
+            width: 100%;
+            padding: 14px;
+            background-color: #0288d1;
+            color: #ffffff;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit-formal:hover {
+            background-color: #01579b;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="pembagian-wrapper">
+    <div class="form-card-container">
+        <div class="form-header">
+            <h2>Formulir Pendaftaran Lanjutan</h2>
+            <p>Silakan lengkapi data formal siswa untuk melanjutkan ke tahap pembayaran</p>
+        </div>
+
+        <form action="/pendaftaran" method="POST" enctype="multipart/form-data">
+            
+            <!-- 1. IDENTITAS SISWA -->
+            <div class="section-group-title">👤 Data Identitas Siswa</div>
+            <div class="grid-2">
+                <div class="input-box">
+                    <label>Nama Lengkap Siswa *</label>
+                    <input type="text" name="nama" placeholder="Sesuai Akta Birth" required>
+                </div>
+                <div class="input-box">
+                    <label>Nama Panggilan *</label>
+                    <input type="text" name="nama_panggilan" placeholder="Nama panggilan" required>
+                </div>
+                <div class="input-box">
+                    <label>Tanggal Lahir *</label>
+                    <input type="date" name="tgl_lahir" required>
+                </div>
+                <div class="input-box">
+                    <label>Jenis Kelamin *</label>
+                    <select name="jenis_kelamin" required>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <label>Agama *</label>
+                    <input type="text" name="agama" placeholder="Agama" required>
+                </div>
+                <div class="input-box">
+                    <label>Tinggi / Berat Badan *</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" name="tinggi_badan" placeholder="Tinggi (cm)" required style="width: 50%;">
+                        <input type="number" name="berat_badan" placeholder="Berat (kg)" required style="width: 50%;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-box">
+                <label>Alamat Lengkap Tempat Tinggal *</label>
+                <textarea name="alamat" rows="3" placeholder="Masukkan alamat domisili lengkap" required></textarea>
+            </div>
+
+            <!-- 2. DATA ORANG TUA -->
+            <div class="section-group-title">👨‍👩‍👧 Data Orang Tua / Wali</div>
+            <div class="grid-2">
+                <div class="input-box">
+                    <label>Nama Ayah Kandung *</label>
+                    <input type="text" name="nama_ayah" placeholder="Nama lengkap ayah" required>
+                </div>
+                <div class="input-box">
+                    <label>Pekerjaan Ayah *</label>
+                    <input type="text" name="pekerjaan_ayah" placeholder="Pekerjaan ayah" required>
+                </div>
+                <div class="input-box">
+                    <label>Nama Ibu Kandung *</label>
+                    <input type="text" name="nama_ibu" placeholder="Nama lengkap ibu" required>
+                </div>
+                <div class="input-box">
+                    <label>Pekerjaan Ibu *</label>
+                    <input type="text" name="pekerjaan_ibu" placeholder="Pekerjaan ibu" required>
+                </div>
+            </div>
+
+            <!-- 3. UPLOAD BERKAS -->
+            <div class="section-group-title">📂 Upload Berkas Dokumen</div>
+            <div class="grid-2">
+                <div class="input-box file-box">
+                    <label>Upload Kartu Keluarga (KK) *</label>
+                    <input type="file" name="kk" accept="image/*,.pdf" required>
+                </div>
+                <div class="input-box file-box">
+                    <label>Upload Akta Kelahiran *</label>
+                    <input type="file" name="akta" accept="image/*,.pdf" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit-formal">Simpan & Lanjutkan Pembayaran ➔</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

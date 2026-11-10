@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran PPDB - TK Tadika Puri</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .payment-section {
+            padding: 60px 24px;
+            background-color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        .payment-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .payment-title {
+            text-align: center;
+            color: #01579b;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .payment-subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+
+        /* CARD PILIHAN BANK */
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .bank-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .bank-card:hover {
+            border-color: #0288d1;
+            transform: translateY(-2px);
+        }
+
+        .bank-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0288d1;
+            margin-bottom: 6px;
+        }
+
+        .bank-number {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .bank-holder {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .btn-copy {
+            background-color: #e0f2fe;
+            color: #0288d1;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-copy:hover {
+            background-color: #0288d1;
+            color: #ffffff;
+        }
+
+        /* FORM UNGGAH BUKTI */
+        .upload-card {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(2, 136, 209, 0.08);
+        }
+
+        .upload-card h3 {
+            color: #01579b;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+        }
+
+        .btn-submit-pay {
+            width: 100%;
+            padding: 14px;
+            background-color: #0288d1;
+            color: #ffffff;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .btn-submit-pay:hover {
+            background-color: #01579b;
+        }
+    </style>
+</head>
+<body>
+
+<section class="payment-section">
+    <div class="payment-container">
+        <h2 class="payment-title">Pembayaran Biaya PPDB</h2>
+        <p class="payment-subtitle">Silakan transfer biaya pendaftaran ke salah satu rekening bank resmi di bawah ini:</p>
+
+        <!-- DAFTAR REKENING BANK -->
+        <div class="bank-grid">
+            <!-- BANK BCA -->
+            <div class="bank-card">
+                <div class="bank-name">BANK BCA</div>
+                <div class="bank-number" id="rek-bca">1234567890</div>
+                <div class="bank-holder">a.n TK Tadika Puri</div>
+                <button class="btn-copy" onclick="copyRek('rek-bca')">📋 Salin Rekening</button>
+            </div>
+
+            <!-- BANK MANDIRI -->
+            <div class="bank-card">
+                <div class="bank-name">BANK MANDIRI</div>
+                <div class="bank-number" id="rek-mandiri">0987654321123</div>
+                <div class="bank-holder">a.n TK Tadika Puri</div>
+                <button class="btn-copy" onclick="copyRek('rek-mandiri')">📋 Salin Rekening</button>
+            </div>
+
+            <!-- BANK BRI -->
+            <div class="bank-card">
+                <div class="bank-name">BANK BRI</div>
+                <div class="bank-number" id="rek-bri">567801009988531</div>
+                <div class="bank-holder">a.n TK Tadika Puri</div>
+                <button class="btn-copy" onclick="copyRek('rek-bri')">📋 Salin Rekening</button>
+            </div>
+        </div>
+
+        <!-- FORM UNGGAH BUKTI BAYAR -->
+        <div class="upload-card">
+            <h3>Konfirmasi Pembayaran</h3>
+            <form action="/pembayaran" method="POST" enctype="multipart/form-data">
+                <div class="input-group">
+                    <label>Unggah Bukti Transfer (JPG/PNG) *</label>
+                    <input type="file" name="bukti" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn-submit-pay">Kirim Bukti Pembayaran</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    function copyRek(id) {
+        var rekText = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(rekText);
+        alert("Nomor rekening berhasil disalin: " + rekText);
+    }
+</script>
+
+</body>
+</html>

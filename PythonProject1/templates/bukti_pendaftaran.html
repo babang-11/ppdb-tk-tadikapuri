@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Surat Keterangan Penerimaan - TK Tadika Puri</title>
+    
+    <!-- BARIS FAVICON LOGO TAB BROWSER -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/logo-transparent.png') }}" type="image/x-icon">
+
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; padding: 40px; color: #000; line-height: 1.6; }
+        .surat-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 24px; }
+        .surat-header h2 { margin: 0; font-size: 1.5rem; text-transform: uppercase; }
+        .surat-header p { margin: 2px 0; font-size: 0.95rem; }
+        
+        .title { text-align: center; font-weight: bold; font-size: 1.2rem; text-decoration: underline; margin-bottom: 20px; }
+        .content { margin-bottom: 20px; font-size: 1.05rem; }
+        
+        .table-data { width: 100%; border-collapse: collapse; margin: 15px 0 25px 20px; }
+        .table-data td { padding: 6px 8px; vertical-align: top; }
+        .table-data td.label { width: 220px; font-weight: bold; }
+        
+        .ttd-section { margin-top: 50px; float: right; text-align: center; width: 250px; }
+        
+        @media print {
+            .no-print { display: none; }
+        }
+        .btn-print { padding: 10px 20px; background-color: #0288d1; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<button class="btn-print no-print" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+
+<div class="surat-header">
+    <h2>TK TADIKA PURI</h2>
+    <p>Jl. Raya Jakarta No. 123, Jakarta Indonesia</p>
+    <p>Telp: (021) 7709548 | Email: info@tktadikapuri.sch.id</p>
+</div>
+
+<div class="title">SURAT KETERANGAN PENERIMAAN SISWA BARU</div>
+
+<div class="content">
+    <p>Berdasarkan hasil verifikasi formulir dan kelengkapan administrasi pendaftaran Panitia Penerimaan Peserta Didik Baru (PPDB) TK Tadika Puri, dengan ini menerangkan bahwa:</p>
+    
+    <table class="table-data">
+        <tr>
+            <td class="label">Nama Lengkap Siswa</td>
+            <td>: {{ siswa[1] if siswa[1] else '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nama Panggilan</td>
+            <td>: {{ siswa[2] if siswa[2] else '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Tempat, Tanggal Lahir</td>
+            <td>: {{ siswa[3] if siswa[3] else '-' }}, {{ siswa[4] if siswa[4] else '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Jenis Kelamin</td>
+            <td>: {{ siswa[5] if siswa[5] else '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nama Orang Tua / Wali</td>
+            <td>: {{ siswa[10] if siswa[10] else siswa[12] }}</td>
+        </tr>
+        <tr>
+            <td class="label">Status Pendaftaran</td>
+            <td>: <strong style="color: green;">DITERIMA / LUNAS</strong></td>
+        </tr>
+    </table>
+
+    <p>Dinyatakan <strong>DITERIMA</strong> sebagai siswa baru di <strong>TK Tadika Puri</strong> untuk Tahun Ajaran Ajaran Baru.</p>
+    <p>Demikian surat keterangan ini diterbitkan untuk dipergunakan sebagaimana mestinya.</p>
+</div>
+
+<div class="ttd-section">
+    <p>Jakarta, {{ current_date if current_date else '22 Oktober 2026' }}</p>
+    <p>Kepala Sekolah TK Tadika Puri</p>
+    <br><br><br>
+    <p><strong><u>( Dra. Hj. Siti Rahmah )</u></strong></p>
+</div>
+
+</body>
+</html>

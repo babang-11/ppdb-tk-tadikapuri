@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - PPDB TK Tadika Puri</title>
+    
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        .login-section {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 32px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(2, 136, 209, 0.12);
+            border: 1px solid #e0f2fe;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 28px;
+        }
+
+        .login-header img {
+            height: 50px;
+            margin-bottom: 12px;
+        }
+
+        .login-header h2 {
+            color: #01579b;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .login-card .input-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .login-card .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .login-card .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .login-card .input-group input:focus {
+            border-color: #0288d1;
+            box-shadow: 0 0 0 4px rgba(2, 136, 209, 0.15);
+        }
+
+        .btn-login-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #0288d1;
+            color: #ffffff;
+            border: none;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 136, 209, 0.25);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-login-submit:hover {
+            background-color: #01579b;
+            transform: translateY(-2px);
+        }
+
+        .login-footer-links {
+            margin-top: 22px;
+            font-size: 0.85rem;
+            color: #64748b;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .login-footer-links a {
+            color: #0288d1;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .alert-flash {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<section class="login-section">
+    <div class="login-card">
+        <div class="login-header">
+            <img src="{{ url_for('static', filename='image/logo-transparent.png') }}" alt="Logo TK Tadika Puri">
+            <h2>Masuk Akun PPDB</h2>
+            <p>Silakan masuk untuk memantau status pendaftaran</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert-flash">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
+            <div class="input-group">
+                <label>Email *</label>
+                <input type="email" name="email" placeholder="Masukkan email terdaftar" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password *</label>
+                <input type="password" name="password" placeholder="Masukkan password" required>
+            </div>
+
+            <button type="submit" class="btn-login-submit">Masuk Sekarang</button>
+        </form>
+
+        <div class="login-footer-links">
+            <p>Belum daftar? <a href="/#daftar">Daftar Akun Baru</a></p>
+            <p><a href="/lupa_password">Lupa Password?</a></p>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

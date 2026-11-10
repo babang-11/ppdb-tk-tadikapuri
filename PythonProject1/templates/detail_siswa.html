@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Data Siswa - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 24px; }
+        .header h1 { color: #01579b; font-size: 1.5rem; }
+        .btn-back { padding: 8px 16px; background-color: #64748b; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
+        
+        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .info-group label { display: block; font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+        .info-group p { font-size: 0.95rem; font-weight: 600; color: #0f172a; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; }
+
+        .berkas-section { margin-top: 24px; border-top: 1.5px solid #e2e8f0; padding-top: 20px; }
+        .berkas-section h3 { color: #01579b; font-size: 1.1rem; margin-bottom: 16px; }
+        .berkas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .berkas-card { border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; text-align: center; background: #f8fafc; }
+        .berkas-card a { display: inline-block; margin-top: 8px; color: #0288d1; font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Detail Formulir & Berkas Pendaftaran</h1>
+        <a href="/data_siswa" class="btn-back">← Kembali ke Data Siswa</a>
+    </div>
+
+    <div class="grid-info">
+        <div class="info-group">
+            <label>Nama Lengkap Siswa</label>
+            <p>{{ siswa[1] if siswa[1] else '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Nama Panggilan</label>
+            <p>{{ siswa[2] if siswa[2] else '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Tempat, Tanggal Lahir</label>
+            <p>{{ siswa[3] if siswa[3] else '-' }}, {{ siswa[4] if siswa[4] else '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Jenis Kelamin</label>
+            <p>{{ siswa[5] if siswa[5] else '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Agama</label>
+            <p>{{ siswa[6] if siswa[6] else '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Tinggi & Berat Badan</label>
+            <p>{{ siswa[8] if siswa[8] else '-' }} cm / {{ siswa[9] if siswa[9] else '-' }} kg</p>
+        </div>
+        <div class="info-group" style="grid-column: span 2;">
+            <label>Alamat Lengkap Domisili</label>
+            <p>{{ siswa[7] if siswa[7] else '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Data Ayah</label>
+            <p>{{ siswa[10] if siswa[10] else '-' }} ({{ siswa[11] if siswa[11] else '-' }})</p>
+        </div>
+        <div class="info-group">
+            <label>Data Ibu</label>
+            <p>{{ siswa[12] if siswa[12] else '-' }} ({{ siswa[13] if siswa[13] else '-' }})</p>
+        </div>
+    </div>
+
+    <div class="berkas-section">
+        <h3>Lampiran Dokumen Pendaftar</h3>
+        <div class="berkas-grid">
+            <div class="berkas-card">
+                <strong>Kartu Keluarga (KK)</strong><br>
+                {% if siswa[14] and ('.' in siswa[14]) %}
+                <a href="{{ url_for('static', filename='uploads/' + siswa[14]) }}" target="_blank">🔍 Buka Berkas KK</a>
+                {% else %} <span style="color: #94a3b8; font-size: 0.85rem;">Tidak diunggah / Kosong</span> {% endif %}
+            </div>
+            <div class="berkas-card">
+                <strong>Akta Kelahiran</strong><br>
+                {% if siswa[15] and ('.' in siswa[15]) %}
+                <a href="{{ url_for('static', filename='uploads/' + siswa[15]) }}" target="_blank">🔍 Buka Akta</a>
+                {% else %} <span style="color: #94a3b8; font-size: 0.85rem;">Tidak diunggah / Kosong</span> {% endif %}
+            </div>
+            <div class="berkas-card">
+                <strong>Foto Siswa</strong><br>
+                {% if siswa[16] and ('.' in siswa[16]) %}
+                <a href="{{ url_for('static', filename='uploads/' + siswa[16]) }}" target="_blank">🔍 Buka Foto</a>
+                {% else %} <span style="color: #94a3b8; font-size: 0.85rem;">Tidak diunggah / Kosong</span> {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Siswa - Admin TK Tadika Puri</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .sidebar { width: 260px; background-color: #0f172a; color: #ffffff; padding: 24px 16px; display: flex; flex-direction: column; }
+        .sidebar-brand { font-size: 1.25rem; font-weight: 700; margin-bottom: 32px; padding: 0 12px; color: #38bdf8; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #94a3b8; text-decoration: none; font-weight: 500; border-radius: 12px; transition: all 0.2s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background-color: #0288d1; color: #ffffff; }
+
+        .main-content { flex: 1; padding: 36px 40px; }
+        .header-title { margin-bottom: 28px; }
+        .header-title h1 { font-size: 1.8rem; color: #01579b; font-weight: 700; }
+        .header-title p { color: #64748b; font-size: 0.95rem; }
+
+        .table-card { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; table-layout: auto; }
+        th { background-color: #01579b; color: #ffffff; padding: 16px; font-size: 0.88rem; font-weight: 600; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.88rem; color: #334155; vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
+
+        .action-btns { display: flex; gap: 6px; align-items: center; }
+        .btn-detail { padding: 6px 10px; background-color: #0f172a; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+        .btn-edit { padding: 6px 10px; background-color: #3b82f6; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+        .btn-delete { padding: 6px 10px; background-color: #ef4444; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+        .btn-cetak-item { padding: 6px 10px; background-color: #eab308; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+        .btn-wa { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background-color: #16a34a; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; }
+        
+        .btn-detail:hover { background-color: #1e293b; }
+        .btn-edit:hover { background-color: #2563eb; }
+        .btn-delete:hover { background-color: #dc2626; }
+        .btn-cetak-item:hover { background-color: #ca8a04; }
+        .btn-wa:hover { background-color: #15803d; }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">Panel Admin</div>
+        <ul class="sidebar-menu">
+            <li><a href="/admin_dashboard">📊 Dashboard</a></li>
+            <li><a href="/data_siswa" class="active">👥 Data Siswa</a></li>
+            <li><a href="/data_pembayaran">💳 Data Pembayaran</a></li>
+            <li><a href="/cetak_pdf" target="_blank">📄 Rekap PDF Diterima</a></li>
+            <li><a href="/">🏠 Halaman Utama</a></li>
+            <li style="margin-top: auto;"><a href="/logout" style="color: #fca5a5;">🚪 Logout</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header-title">
+            <h1>Kelola Data Siswa Pendaftar</h1>
+            <p>Daftar seluruh siswa yang telah melengkapi data formulir pendaftaran PPDB.</p>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px; text-align: center;">No</th>
+                        <th>Nama Siswa</th>
+                        <th>Tgl Lahir / JK</th>
+                        <th>Alamat Domisili</th>
+                        <th>Kirim Dokumen (WA)</th>
+                        <th>Aksi Pengelolaan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in siswa %}
+                    <tr>
+                        <td style="text-align: center;">{{ loop.index }}</td>
+                        <td><b>{{ row[1] }}</b></td>
+                        <td>{{ row[4] }}<br><small style="color: #64748b;">{{ row[5] }}</small></td>
+                        <td>{{ row[7] }}</td>
+                        <td>
+                            <!-- AKSES CEPTAK KIRIM WA LANGSUNG KE WALI SISWA -->
+                            <a href="https://wa.me/?text=Halo%20Orang%20Tua%20dari%20{{ row[1] }},%20berikut%20Surat%20Keterangan%20Penerimaan%20PPDB%20TK%20Tadika%20Puri." target="_blank" class="btn-wa">
+                                💬 Kirim WA
+                            </a>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <a href="/detail_siswa/{{ row[0] }}" class="btn-detail">👁️ Berkas</a>
+                                <a href="/edit_siswa/{{ row[0] }}" class="btn-edit">Edit</a>
+                                <a href="/hapus_siswa/{{ row[0] }}" class="btn-delete" onclick="return confirm('Hapus data siswa ini?')">Hapus</a>
+                                <a href="/cetak_bukti/{{ row[0] }}" target="_blank" class="btn-cetak-item">📄 Surat PDF</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">Belum ada data siswa terdaftar.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

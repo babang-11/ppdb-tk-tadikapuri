@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Selesai - TK Tadika Puri</title>
+
+    <!-- Google Fonts Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .thanks-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .thanks-card {
+            background-color: #ffffff;
+            max-width: 620px;
+            width: 100%;
+            padding: 48px 36px;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(2, 136, 209, 0.12);
+            border: 1px solid #e0f2fe;
+        }
+
+        .thanks-icon {
+            font-size: 3.8rem;
+            margin-bottom: 16px;
+        }
+
+        .thanks-badge {
+            display: inline-block;
+            background-color: #e0f2fe;
+            color: #0288d1;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .thanks-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #01579b;
+            margin-bottom: 14px;
+            line-height: 1.3;
+        }
+
+        .thanks-text {
+            font-size: 1rem;
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .btn-thanks-dashboard {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #0288d1;
+            color: #ffffff;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-thanks-dashboard:hover {
+            background-color: #01579b;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<section class="thanks-section">
+    <div class="thanks-card">
+        <div class="thanks-icon">🎉</div>
+        <div class="thanks-badge">Bukti Pembayaran Terkirim</div>
+        
+        <h1 class="thanks-title">Pendaftaran Selesai!<br>Data Kamu Diterima</h1>
+        
+        <p class="thanks-text">
+            Terima kasih telah melakukan pendaftaran di <b>TK Tadika Puri</b>.<br>
+            Kami akan segera memverifikasi bukti pembayaran Anda dan menghubungi Anda melalui pesan <b>WhatsApp / Email</b> yang terdaftar.
+        </p>
+
+        <a href="/dashboard" class="btn-thanks-dashboard">Masuk ke Dashboard</a>
+    </div>
+</section>
+
+</body>
+</html>
