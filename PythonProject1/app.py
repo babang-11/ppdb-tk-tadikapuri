@@ -16,10 +16,11 @@ app = Flask(__name__)
 app.secret_key = 'secret123'
 
 # ================= DATABASE =================
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'tk_tadika_puri'
+app.config['MYSQL_HOST'] = 'mysql-ppdb-ilhamjayakusuma971-7b4a.a.aivencloud.com'
+app.config['MYSQL_USER'] = 'avnadmin'
+app.config['MYSQL_PASSWORD'] = 'AVNS_k87rZZSiK5EuX-MqLA1'
+app.config['MYSQL_DB'] = 'defaultdb'
+app.config['MYSQL_PORT'] = 19797
 mysql = MySQL(app)
 
 UPLOAD_FOLDER = 'static/uploads'
