@@ -4,13 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPDB TK Tadika Puri</title>
-
+    
     <!-- Google Fonts Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- CSS RESPONSIVE MOBILE -->
+    <style>
+        @media screen and (max-width: 768px) {
+            /* 1. Navbar & Header */
+            .navbar {
+                padding: 12px 15px !important;
+            }
+            .nav-container {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 12px !important;
+            }
+            .nav-menu {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 10px 15px !important;
+                width: 100% !important;
+            }
+            .nav-link {
+                font-size: 14px !important;
+            }
+            .btn-nav-primary {
+                padding: 8px 16px !important;
+                font-size: 13px !important;
+            }
+
+            /* 2. Hero Section */
+            .hero-container {
+                flex-direction: column-reverse !important;
+                text-align: center !important;
+                gap: 25px !important;
+                padding: 20px 15px !important;
+            }
+            .hero-title {
+                font-size: 22px !important;
+                line-height: 1.3 !important;
+            }
+            .hero-description {
+                font-size: 14px !important;
+                margin: 12px 0 20px 0 !important;
+            }
+            .hero-buttons {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 10px !important;
+            }
+            .btn-smm {
+                width: 90% !important;
+                max-width: 300px !important;
+                text-align: center !important;
+                padding: 12px 20px !important;
+            }
+
+            /* 3. Tentang & Section Lainnya */
+            .about-container {
+                flex-direction: column !important;
+                text-align: center !important;
+                gap: 20px !important;
+            }
+            .program-grid, .card-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+            .footer-container {
+                flex-direction: column !important;
+                gap: 25px !important;
+                text-align: center !important;
+            }
+            .footer-logo {
+                justify-content: center !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
