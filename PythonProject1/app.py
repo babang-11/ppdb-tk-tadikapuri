@@ -1,7 +1,5 @@
-import pymysql
-pymysql.install_as_MySQLdb()
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
-from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
@@ -17,32 +15,99 @@ app = Flask(__name__)
 # ================= SECRET KEY =================
 app.secret_key = 'secret123'
 
-# ================= DATABASE =================
-app.config['MYSQL_HOST'] = 'mysql-ppdb-ilhamjayakusuma971-7b4a.a.aivencloud.com'
-app.config['MYSQL_USER'] = 'avnadmin'
-app.config['MYSQL_PASSWORD'] = 'AVNS_k87rZZSiK5EuX-MqLA1'
-app.config['MYSQL_DB'] = 'defaultdb'
-app.config['MYSQL_PORT'] = 19797
-mysql = MySQL(app)
+# ================= KONFIGURASI SQLITE DATABASE =================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'ppdb.db')
 
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Tabel Users
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nama TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT DEFAULT 'user',
+            foto TEXT,
+            no_hp TEXT
+        )
+    """)
+
+    # Tabel Siswa
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS siswa (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nama_siswa TEXT,
+            nama_panggilan TEXT,
+            tempat_lahir TEXT,
+            tanggal_lahir TEXT,
+            jenis_kelamin TEXT,
+            agama TEXT,
+            alamat TEXT,
+            tinggi_badan TEXT,
+            berat_badan TEXT,
+            nama_ayah TEXT,
+            pekerjaan_ayah TEXT,
+            nama_ibu TEXT,
+            pekerjaan_ibu TEXT,
+            file_kk TEXT,
+            file_akta TEXT,
+            foto TEXT,
+            status TEXT DEFAULT 'Belum Verifikasi'
+        )
+    """)
+
+    # Tabel Pembayaran
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS pembayaran (
+            id_pembayaran INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            bukti TEXT,
+            status TEXT DEFAULT 'Menunggu Verifikasi'
+        )
+    """)
+
+    # Buat akun admin default jika belum ada
+    cur.execute("SELECT * FROM users WHERE role='admin'")
+    if not cur.fetchone():
+        cur.execute(
+            "INSERT INTO users (nama, email, password, role) VALUES (?, ?, ?, ?)",
+            ('Admin TK Tadika Puri', 'admin@tadikapuri.com', 'admin123', 'admin')
+        )
+
+    conn.commit()
+    conn.close()
+
+# Jalankan inisialisasi tabel saat aplikasi dimuat
+init_db()
 
 # ================= LANDING PAGE / HOME =================
 @app.route('/')
 def home():
     sudah_bayar = False
     if 'login' in session:
-        cur = mysql.connection.cursor()
+        conn = get_db()
+        cur = conn.cursor()
         cur.execute("""
             SELECT *
             FROM pembayaran
-            WHERE email=%s
+            WHERE email=?
             ORDER BY id_pembayaran DESC
             LIMIT 1
         """, (session['email'],))
         bayar = cur.fetchone()
-        cur.close()
+        conn.close()
         if bayar:
             sudah_bayar = True
 
@@ -55,18 +120,26 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT nama, email, password, role FROM users WHERE email=%s", (email,))
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT nama, email, password, role, foto FROM users WHERE email=?", (email,))
         user = cur.fetchone()
-        cur.close()
+        conn.close()
 
-        if user and user[2] == password:
+        # Mendukung pengecekan password plain text maupun password hasil reset (hash)
+        is_valid = False
+        if user:
+            if user[2] == password or check_password_hash(user[2], password):
+                is_valid = True
+
+        if is_valid:
             session['login'] = True
             session['nama'] = user[0]
             session['email'] = user[1]
             session['role'] = user[3]
+            if user[4]:
+                session['foto'] = user[4]
 
-            # JIKA ADMIN -> LANGSUNG KE DASHBOARD ADMIN
             if user[3] == 'admin':
                 return redirect('/admin_dashboard')
             else:
@@ -82,21 +155,21 @@ def dashboard():
     if 'login' not in session:
         return redirect('/login')
 
-    # JIKA ADMIN TERMASUK BUKA /dashboard -> ALIHKAN OTOMATIS KE /admin_dashboard
     if session.get('role') == 'admin':
         return redirect('/admin_dashboard')
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("""
         SELECT status
         FROM pembayaran
-        WHERE email=%s
+        WHERE email=?
         ORDER BY id_pembayaran DESC
         LIMIT 1
     """, (session['email'],))
 
     data = cur.fetchone()
-    cur.close()
+    conn.close()
 
     status = data[0] if data else "Belum Bayar"
 
@@ -109,22 +182,29 @@ def register():
         nama = request.form['nama']
         email = request.form['email']
         password = request.form['password']
+        no_hp = request.form.get('no_hp', '')
 
-        cur = mysql.connection.cursor()
+        conn = get_db()
+        cur = conn.cursor()
+        
+        cur.execute("SELECT id FROM users WHERE email=?", (email,))
+        if cur.fetchone():
+            conn.close()
+            flash("Email sudah terdaftar! Silakan login atau gunakan email lain.")
+            return redirect('/login')
+
         cur.execute(
-            "INSERT INTO users (nama, email, password, role) VALUES (%s, %s, %s, %s)",
-            (nama, email, password, 'user')
+            "INSERT INTO users (nama, email, password, role, no_hp) VALUES (?, ?, ?, ?, ?)",
+            (nama, email, password, 'user', no_hp)
         )
-        mysql.connection.commit()
-        cur.close()
+        conn.commit()
+        conn.close()
 
-        # Otomatis login session
         session['login'] = True
         session['nama'] = nama
         session['email'] = email
         session['role'] = 'user'
 
-        # Lanjut ke Langkah 2: Pendaftaran Formal
         return redirect(url_for('pendaftaran'))
 
     return render_template('register.html')
@@ -136,7 +216,6 @@ def pendaftaran():
         return redirect('/login')
 
     if request.method == 'POST':
-        email = session['email']
         nama = request.form['nama']
         nama_panggilan = request.form['nama_panggilan']
         alamat = request.form['alamat']
@@ -153,7 +232,7 @@ def pendaftaran():
 
         def save_file(file):
             if file and file.filename != '':
-                filename = secure_filename(file.filename)
+                filename = str(int(time.time())) + "_" + secure_filename(file.filename)
                 if not os.path.exists(app.config['UPLOAD_FOLDER']):
                     os.makedirs(app.config['UPLOAD_FOLDER'])
                 path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -165,7 +244,8 @@ def pendaftaran():
         akta = save_file(request.files.get('akta'))
         foto = save_file(request.files.get('foto'))
 
-        cur = mysql.connection.cursor()
+        conn = get_db()
+        cur = conn.cursor()
         cur.execute("""
             INSERT INTO siswa (
                 nama_siswa, nama_panggilan, tempat_lahir, tanggal_lahir,
@@ -173,7 +253,7 @@ def pendaftaran():
                 nama_ayah, pekerjaan_ayah, nama_ibu, pekerjaan_ibu,
                 file_kk, file_akta, foto, status
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             nama, nama_panggilan, 'Depok', tgl_lahir,
             jenis_kelamin, agama, alamat, tinggi_badan, berat_badan,
@@ -181,10 +261,9 @@ def pendaftaran():
             kk, akta, foto, 'Belum Verifikasi'
         ))
 
-        mysql.connection.commit()
-        cur.close()
+        conn.commit()
+        conn.close()
 
-        # Lanjut ke Langkah 3: Pembayaran
         return redirect(url_for('pembayaran'))
 
     return render_template('pendaftaran.html')
@@ -198,22 +277,22 @@ def pembayaran():
     if request.method == 'POST':
         file = request.files['bukti']
 
-        folder = 'static/bukti'
+        folder = os.path.join(BASE_DIR, 'static/bukti')
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         filename = str(int(time.time())) + "_" + secure_filename(file.filename)
         file.save(os.path.join(folder, filename))
 
-        cur = mysql.connection.cursor()
+        conn = get_db()
+        cur = conn.cursor()
         cur.execute("""
             INSERT INTO pembayaran (email, bukti, status)
-            VALUES (%s, %s, %s)
+            VALUES (?, ?, ?)
         """, (session['email'], filename, 'Menunggu Verifikasi'))
-        mysql.connection.commit()
-        cur.close()
+        conn.commit()
+        conn.close()
 
-        # Halaman peninjauan sukses
         return render_template('terima_kasih.html')
 
     return render_template('bukti_pembayaran.html')
@@ -224,34 +303,31 @@ def status_pembayaran():
     if 'login' not in session:
         return redirect('/login')
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     
-    # 1. Ambil status pembayaran
     cur.execute("""
         SELECT status 
         FROM pembayaran 
-        WHERE email=%s 
+        WHERE email=? 
         ORDER BY id_pembayaran DESC 
         LIMIT 1
     """, (session['email'],))
     data_bayar = cur.fetchone()
 
-    # 2. Ambil ID siswa terbaru (berdasarkan kemiripan nama atau ambil ID paling akhir jika nama cocok)
-    cur.execute("SELECT id FROM siswa WHERE nama_siswa LIKE %s ORDER BY id DESC LIMIT 1", ('%' + session['nama'] + '%',))
+    cur.execute("SELECT id FROM siswa WHERE nama_siswa LIKE ? ORDER BY id DESC LIMIT 1", ('%' + session['nama'] + '%',))
     data_siswa = cur.fetchone()
     
-    # Jika masih tidak ketemu berdasarkan nama, ambil ID siswa paling akhir yang terdaftar
     if not data_siswa:
         cur.execute("SELECT id FROM siswa ORDER BY id DESC LIMIT 1")
         data_siswa = cur.fetchone()
         
-    cur.close()
+    conn.close()
 
     status = data_bayar[0] if data_bayar else "Belum Bayar"
     id_siswa = data_siswa[0] if data_siswa else None
 
     return render_template('status_pembayaran.html', status=status, id_siswa=id_siswa)
-
 
 # ================= DOWNLOAD SURAT PENERIMAAN UNTUK USER =================
 @app.route('/download_bukti_user/<id>')
@@ -267,33 +343,36 @@ def profile():
     if 'login' not in session:
         return redirect('/login')
 
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM users WHERE email=%s", (session['email'],))
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE email=?", (session['email'],))
     user = cur.fetchone()
 
     if request.method == 'POST':
         nama = request.form['nama']
         no_hp = request.form['no_hp']
         foto = request.files.get('foto')
-        nama_foto = user[5] if user and len(user) > 5 else None
+        nama_foto = user['foto'] if user and user['foto'] else None
 
         if foto and foto.filename != '':
+            if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                os.makedirs(app.config['UPLOAD_FOLDER'])
             nama_foto = secure_filename(foto.filename)
             foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nama_foto))
 
         cur.execute("""
             UPDATE users
-            SET nama=%s, no_hp=%s, foto=%s
-            WHERE email=%s
+            SET nama=?, no_hp=?, foto=?
+            WHERE email=?
         """, (nama, no_hp, nama_foto, session['email']))
 
-        mysql.connection.commit()
+        conn.commit()
         session['nama'] = nama
         session['foto'] = nama_foto
-        cur.close()
+        conn.close()
         return redirect('/profile')
 
-    cur.close()
+    conn.close()
     return render_template('profile.html', user=user)
 
 # ================= DASHBOARD ADMIN =================
@@ -302,13 +381,14 @@ def admin_dashboard():
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM users")
     total_user = cur.fetchone()[0]
 
     cur.execute("SELECT COUNT(*) FROM pembayaran WHERE status='Menunggu Verifikasi'")
     pending = cur.fetchone()[0]
-    cur.close()
+    conn.close()
 
     return render_template('admin_dashboard.html', total_user=total_user, pending=pending)
 
@@ -318,10 +398,11 @@ def data_siswa():
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("SELECT * FROM siswa")
     data = cur.fetchall()
-    cur.close()
+    conn.close()
 
     return render_template('data_siswa.html', siswa=data)
 
@@ -331,10 +412,11 @@ def detail_siswa(id):
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM siswa WHERE id=%s", (id,))
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM siswa WHERE id=?", (id,))
     siswa = cur.fetchone()
-    cur.close()
+    conn.close()
 
     if not siswa:
         return "Data siswa tidak ditemukan!"
@@ -347,7 +429,8 @@ def edit_siswa(id):
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
 
     if request.method == 'POST':
         nama = request.form['nama_siswa']
@@ -357,17 +440,17 @@ def edit_siswa(id):
 
         cur.execute("""
             UPDATE siswa
-            SET nama_siswa=%s, jenis_kelamin=%s, tanggal_lahir=%s, alamat=%s
-            WHERE id=%s
+            SET nama_siswa=?, jenis_kelamin=?, tanggal_lahir=?, alamat=?
+            WHERE id=?
         """, (nama, jk, tgl, alamat, id))
 
-        mysql.connection.commit()
-        cur.close()
+        conn.commit()
+        conn.close()
         return redirect('/data_siswa')
 
-    cur.execute("SELECT * FROM siswa WHERE id=%s", (id,))
+    cur.execute("SELECT * FROM siswa WHERE id=?", (id,))
     siswa = cur.fetchone()
-    cur.close()
+    conn.close()
 
     return render_template('edit_siswa.html', siswa=siswa)
 
@@ -377,10 +460,11 @@ def hapus_siswa(id):
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM siswa WHERE id=%s", (id,))
-    mysql.connection.commit()
-    cur.close()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM siswa WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
 
     return redirect('/data_siswa')
 
@@ -390,14 +474,15 @@ def data_pembayaran():
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("""
         SELECT id_pembayaran, email, bukti, status
         FROM pembayaran
         ORDER BY id_pembayaran DESC
     """)
     data = cur.fetchall()
-    cur.close()
+    conn.close()
 
     return render_template('data_pembayaran.html', pembayaran=data)
 
@@ -407,15 +492,16 @@ def verifikasi(id, status):
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("""
         UPDATE pembayaran
-        SET status=%s
-        WHERE id_pembayaran=%s
+        SET status=?
+        WHERE id_pembayaran=?
     """, (status, id))
 
-    mysql.connection.commit()
-    cur.close()
+    conn.commit()
+    conn.close()
 
     return redirect('/data_pembayaran')
 
@@ -424,14 +510,15 @@ def acc(id):
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("""
         UPDATE pembayaran 
         SET status='Lunas' 
-        WHERE id_pembayaran=%s
+        WHERE id_pembayaran=?
     """, (id,))
-    mysql.connection.commit()
-    cur.close()
+    conn.commit()
+    conn.close()
 
     return redirect(url_for('data_pembayaran'))
 
@@ -448,13 +535,14 @@ def tambah_user():
 
     password_hash = generate_password_hash(password)
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute(
-        "INSERT INTO users (nama, email, password, role) VALUES (%s,%s,%s,%s)",
+        "INSERT INTO users (nama, email, password, role) VALUES (?, ?, ?, ?)",
         (nama, email, password_hash, role)
     )
-    mysql.connection.commit()
-    cur.close()
+    conn.commit()
+    conn.close()
 
     return redirect(url_for('admin_dashboard'))
 
@@ -463,10 +551,11 @@ def hapus_user(id):
     if session.get('role') != 'admin':
         return "Akses ditolak ❌"
 
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM users WHERE id=%s", (id,))
-    mysql.connection.commit()
-    cur.close()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
 
     return redirect(url_for('admin_dashboard'))
 
@@ -476,7 +565,8 @@ def cetak_pdf():
     if session.get('role') != 'admin':
         return "Akses Ditolak!"
 
-    cur = mysql.connection.cursor()
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("""
         SELECT s.nama_siswa, s.jenis_kelamin, s.alamat, p.status 
         FROM siswa s
@@ -484,14 +574,14 @@ def cetak_pdf():
         GROUP BY s.id
     """)
     data_siswa = cur.fetchall()
-    cur.close()
+    conn.close()
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
     elements = []
     styles = getSampleStyleSheet()
 
-    logo_path = "static/image/logo-transparent.png"
+    logo_path = os.path.join(BASE_DIR, "static/image/logo-transparent.png")
     logo = Image(logo_path, width=65, height=65) if os.path.exists(logo_path) else Paragraph("", styles['Normal'])
     
     header_text = Paragraph(
@@ -513,7 +603,6 @@ def cetak_pdf():
     elements.append(kop_table)
     elements.append(Spacer(1, 15))
 
-    # JUDUL TANPA KATA DITERIMA
     title = Paragraph("<font size='12' color='#01579b'><b>REKAPITULASI DATA SISWA (TAHUN AJARAN BARU)</b></font>", styles['Title'])
     elements.append(title)
     elements.append(Spacer(1, 15))
@@ -551,7 +640,6 @@ def cetak_pdf():
     elements.append(tabel_laporan)
     elements.append(Spacer(1, 25))
 
-    # TANDA TANGAN TANPA TAG HTML <b>
     ttd_data = [
         ['', 'Depok, ' + time.strftime('%d %B %Y')],
         ['', 'Kepala Sekolah TK Tadika Puri'],
@@ -572,23 +660,22 @@ def cetak_pdf():
     response.headers['Content-Disposition'] = 'inline; filename=rekapitulasi_siswa_tahun_ajaran_baru.pdf'
     return response
 
-
 # ================= SURAT PENERIMAAN INDIVIDUAL PER SISWA (PDF REPORTLAB) =================
 @app.route('/cetak_bukti/<id>')
 def cetak_bukti(id):
     if 'login' not in session:
         return redirect('/login')
 
-    cur = mysql.connection.cursor()
-    # Mengambil data siswa spesifik dari tabel database
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("""
         SELECT nama_siswa, nama_panggilan, tempat_lahir, tanggal_lahir, 
                jenis_kelamin, agama, alamat, nama_ayah, nama_ibu
         FROM siswa 
-        WHERE id=%s
+        WHERE id=?
     """, (id,))
     siswa = cur.fetchone()
-    cur.close()
+    conn.close()
 
     if not siswa:
         return "Data siswa tidak ditemukan!"
@@ -598,11 +685,9 @@ def cetak_bukti(id):
     elements = []
     styles = getSampleStyleSheet()
 
-    # Logo Sekolah
-    logo_path = "static/image/logo-transparent.png"
+    logo_path = os.path.join(BASE_DIR, "static/image/logo-transparent.png")
     logo = Image(logo_path, width=65, height=65) if os.path.exists(logo_path) else Paragraph("", styles['Normal'])
 
-    # Header Teks Biru Resmi
     header_text = Paragraph(
         """
         <font size="14" color="#01579b"><b>PANITIA PENERIMAAN PESERTA DIDIK BARU (PPDB)</b></font><br/>
@@ -622,11 +707,9 @@ def cetak_bukti(id):
     elements.append(kop_table)
     elements.append(Spacer(1, 20))
 
-    # Judul Surat
     elements.append(Paragraph("<font size='13' color='#01579b'><b><u>SURAT KETERANGAN PENERIMAAN SISWA BARU</u></b></font>", styles['Normal']))
     elements.append(Spacer(1, 15))
 
-    # Pesan Pembuka
     pesan = Paragraph(
         "Selamat! Berdasarkan hasil verifikasi berkas dan pembayaran administrasi PPDB TK Tadika Puri, dengan ini menyatakan bahwa calon siswa di bawah ini <b>RESMI DITERIMA</b> sebagai siswa baru:",
         styles['Normal']
@@ -634,7 +717,6 @@ def cetak_bukti(id):
     elements.append(pesan)
     elements.append(Spacer(1, 15))
 
-    # Format Data Orang Tua & Biodata
     nama_ayah = siswa[7] if siswa[7] else '-'
     nama_ibu = siswa[8] if siswa[8] else '-'
 
@@ -658,7 +740,6 @@ def cetak_bukti(id):
     elements.append(tabel_biodata)
     elements.append(Spacer(1, 20))
 
-    # Pesan Penutup
     pesan_penutup = Paragraph(
         "Demikian surat keterangan ini diterbitkan untuk dipergunakan sebagaimana mestinya. Silakan simpan surat ini sebagai bukti pendaftaran resmi.",
         styles['Normal']
@@ -666,7 +747,6 @@ def cetak_bukti(id):
     elements.append(pesan_penutup)
     elements.append(Spacer(1, 30))
 
-    # Tanda Tangan
     ttd_data = [
         ['', 'Depok, ' + time.strftime('%d %B %Y')],
         ['', 'Kepala Sekolah TK Tadika Puri'],
@@ -680,7 +760,6 @@ def cetak_bukti(id):
     ]))
     elements.append(ttd_table)
 
-    # Output Stream PDF
     doc.build(elements)
     buffer.seek(0)
     response = make_response(buffer.getvalue())
@@ -688,27 +767,17 @@ def cetak_bukti(id):
     response.headers['Content-Disposition'] = f'inline; filename=Surat_Penerimaan_{siswa[0]}.pdf'
     return response
 
-    # Mengambil data siswa lengkap berdasarkan ID
-    cur.execute("SELECT * FROM siswa WHERE id=%s", (id,))
-    siswa = cur.fetchone()
-    cur.close()
-
-    if not siswa:
-        return "Data siswa tidak ditemukan!"
-
-    # Render template HTML bukti pendaftaran secara langsung
-    return render_template('bukti_pendaftaran.html', siswa=siswa)
-
 # ================= LUPA & RESET PASSWORD =================
 @app.route('/lupa_password', methods=['GET', 'POST'])
 def lupa_password():
     if request.method == 'POST':
         email = request.form['email']
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE email=?", (email,))
         user = cur.fetchone()
-        cur.close()
+        conn.close()
 
         if user:
             return redirect(url_for('reset_password', email=email))
@@ -727,19 +796,20 @@ def reset_password():
             flash("Semua field wajib diisi!")
             return redirect(url_for('reset_password'))
 
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE email=?", (email,))
         user = cur.fetchone()
 
         if not user:
-            cur.close()
+            conn.close()
             flash("User tidak ditemukan!")
             return redirect(url_for('reset_password'))
 
         password_hash = generate_password_hash(password_baru)
-        cur.execute("UPDATE users SET password=%s WHERE email=%s", (password_hash, email))
-        mysql.connection.commit()
-        cur.close()
+        cur.execute("UPDATE users SET password=? WHERE email=?", (password_hash, email))
+        conn.commit()
+        conn.close()
 
         flash("Password berhasil direset! Silakan login.")
         return redirect(url_for('login'))
