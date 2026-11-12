@@ -12,9 +12,8 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- OVERRIDE MOBIL RESPONSIVE -->
+    <!-- CSS HAMBURGER MENU & MOBILE RESPONSIVE -->
     <style>
-        /* Mencegah Halaman Bocor ke Kanan di HP */
         html, body {
             max-width: 100% !important;
             overflow-x: hidden !important;
@@ -22,45 +21,104 @@
             padding: 0 !important;
         }
 
+        /* Sembunyikan tombol hamburger di layar Desktop */
+        .hamburger-btn {
+            display: none;
+            background-color: #0284c7;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            font-size: 22px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .hamburger-btn:hover {
+            background-color: #0369a1;
+        }
+
         @media screen and (max-width: 768px) {
-            /* 1. Reset Navbar agar Tersusun Vertikal & Tidak Melimpah */
+            /* 1. Navbar Header Mobile (Logo Kiri, Tombol Garis Tiga Kanan) */
             .navbar {
-                padding: 10px 12px !important;
+                padding: 12px 16px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
+                position: relative !important;
+                background: #ffffff !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.06) !important;
+                z-index: 999 !important;
             }
             .nav-container {
-                flex-direction: column !important;
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
                 align-items: center !important;
-                justify-content: center !important;
-                gap: 10px !important;
+                flex-wrap: wrap !important;
                 width: 100% !important;
             }
             .logo-navbar {
-                margin: 0 auto !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
             }
+            
+            /* Munculkan Tombol Garis Tiga di Mobile */
+            .hamburger-btn {
+                display: flex !important;
+            }
+
+            /* Sembunyikan Menu Secara Default di Mobile */
             .nav-menu {
+                display: none !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                width: 100% !important;
+                padding: 20px 0 10px 0 !important;
+                margin-top: 12px !important;
+                border-top: 1px solid #f1f5f9 !important;
+                gap: 14px !important;
+                background-color: #ffffff !important;
+            }
+
+            /* Class aktif saat tombol garis tiga diklik */
+            .nav-menu.show-menu {
+                display: flex !important;
+            }
+
+            .nav-link {
+                font-size: 15px !important;
+                font-weight: 500 !important;
+                margin: 0 !important;
+                display: block !important;
+                text-align: center !important;
+                padding: 6px 0 !important;
+            }
+
+            .btn-nav-primary {
+                display: inline-block !important;
+                width: 85% !important;
+                max-width: 260px !important;
+                text-align: center !important;
+                padding: 12px 20px !important;
+                border-radius: 50px !important;
+                margin-top: 4px !important;
+            }
+
+            .profile-box {
+                display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 gap: 8px !important;
-                width: 100% !important;
-            }
-            .nav-link {
-                font-size: 14px !important;
-                margin: 2px 0 !important;
-                display: block !important;
-                text-align: center !important;
-            }
-            .btn-nav-primary, .btn-logout-nav {
-                display: inline-block !important;
-                width: auto !important;
-                margin-top: 5px !important;
-                text-align: center !important;
             }
 
             /* 2. Hero Section Adjust */
             .hero {
-                padding: 20px 10px !important;
+                padding: 25px 15px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
@@ -75,12 +133,12 @@
                 width: 100% !important;
             }
             .hero-title {
-                font-size: 20px !important;
-                line-height: 1.3 !important;
+                font-size: 22px !important;
+                line-height: 1.35 !important;
             }
             .hero-description {
-                font-size: 13px !important;
-                margin: 10px 0 15px 0 !important;
+                font-size: 13.5px !important;
+                margin: 10px 0 18px 0 !important;
             }
             .hero-buttons {
                 flex-direction: column !important;
@@ -107,7 +165,7 @@
                 flex-direction: column !important;
                 text-align: center !important;
                 width: 100% !important;
-                padding: 0 10px !important;
+                padding: 0 15px !important;
                 box-sizing: border-box !important;
             }
             .program-grid, .card-grid {
@@ -137,7 +195,12 @@
             <span>TK Tadika Puri</span>
         </a>
 
-        <div class="nav-menu">
+        <!-- Tombol Garis Tiga (Hamburger Menu) -->
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+            ☰
+        </button>
+
+        <div class="nav-menu" id="navMenu">
             <a href="/" class="nav-link active">Home</a>
             <a href="#tentang" class="nav-link">Tentang Kami</a>
             <a href="#program" class="nav-link">Program</a>
@@ -405,6 +468,29 @@
         </div>
     </div>
 </footer>
+
+<!-- JAVASCRIPT HAMBURGER MENU -->
+<script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const navMenu = document.getElementById('navMenu');
+    const navLinks = document.querySelectorAll('.nav-menu a');
+
+    hamburgerBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('show-menu');
+        // Ubah ikon garis tiga menjadi silang (✕) saat terbuka
+        hamburgerBtn.textContent = navMenu.classList.contains('show-menu') ? '✕' : '☰';
+    });
+
+    // Otomatis tutup menu saat salah satu link diklik di HP
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                navMenu.classList.remove('show-menu');
+                hamburgerBtn.textContent = '☰';
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
