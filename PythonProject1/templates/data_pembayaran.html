@@ -4,111 +4,298 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pembayaran - Admin TK Tadika Puri</title>
-    
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/logo-transparent.png') }}" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; }
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 18%, #638da5 0%, transparent 45%),
+                radial-gradient(circle at 85% 22%, #c3dfee 0%, transparent 52%),
+                radial-gradient(circle at 70% 85%, #8cb7ce 0%, transparent 50%),
+                linear-gradient(135deg, #5c859d 0%, #99c1d6 48%, #d7e9f3 100%);
+            background-attachment: fixed;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
         .admin-layout { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR ADMIN */
-        .sidebar { width: 260px; background-color: #0f172a; color: #ffffff; padding: 24px 16px; display: flex; flex-direction: column; }
-        .sidebar-brand { font-size: 1.25rem; font-weight: 700; margin-bottom: 32px; padding: 0 12px; color: #38bdf8; }
-        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #94a3b8; text-decoration: none; font-weight: 500; border-radius: 12px; transition: all 0.2s; }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background-color: #0288d1; color: #ffffff; }
+        .sidebar {
+            width: 265px; height: 100vh; position: sticky; top: 0;
+            background: linear-gradient(180deg, rgba(44, 76, 98, 0.52) 0%, rgba(34, 62, 82, 0.62) 100%);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            border-right: 1px solid rgba(255, 255, 255, 0.35);
+            padding: 22px 16px;
+            display: flex; flex-direction: column; flex-shrink: 0;
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 8px 18px; margin-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+        }
+        .brand-wrap { display: flex; align-items: center; gap: 12px; }
+        .brand-wrap img { width: 38px; height: 38px; object-fit: contain; background: rgba(255,255,255,0.92); border-radius: 11px; padding: 4px; }
+        .brand-text h2 { font-size: 0.98rem; font-weight: 700; color: #ffffff; line-height: 1.2; }
+        .brand-text span { font-size: 0.72rem; color: rgba(255,255,255,0.78); font-weight: 500; }
+        .btn-close-sidebar {
+            display: none; background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff; width: 34px; height: 34px; border-radius: 10px; font-size: 1.1rem; cursor: pointer;
+        }
 
-        /* MAIN CONTENT */
-        .main-content { flex: 1; padding: 36px 40px; }
-        .header-title { margin-bottom: 28px; }
-        .header-title h1 { font-size: 1.8rem; color: #01579b; font-weight: 700; }
-        .header-title p { color: #64748b; font-size: 0.95rem; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+            color: rgba(255, 255, 255, 0.82); text-decoration: none; font-size: 0.88rem; font-weight: 500;
+            border-radius: 14px; transition: all 0.22s ease;
+        }
+        .sidebar-menu a svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar-menu a:hover { background: rgba(255, 255, 255, 0.16); color: #ffffff; transform: translateX(3px); }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.26); color: #ffffff; font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 16px rgba(15, 35, 52, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.65);
+        }
 
-        /* TABEL */
-        .table-card { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); overflow: hidden; }
+        .sidebar-footer { margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.22); }
+        .btn-logout {
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px;
+            color: #ffffff; background: rgba(220, 38, 38, 0.35); border: 1px solid rgba(255, 255, 255, 0.3);
+            text-decoration: none; font-size: 0.86rem; font-weight: 600;
+        }
+
+        .main-content { flex: 1; padding: 26px 34px; min-width: 0; }
+        .topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+        .btn-hamburger {
+            display: none; align-items: center; justify-content: center;
+            width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.7); color: #0f172a; cursor: pointer;
+        }
+        .topbar-title h1 { font-size: 1.6rem; font-weight: 700; color: #ffffff; text-shadow: 0 2px 10px rgba(15, 45, 70, 0.15); }
+        .topbar-title p { font-size: 0.88rem; color: rgba(255, 255, 255, 0.9); }
+
+        .glass-table-wrap {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.4) 100%);
+            backdrop-filter: blur(22px) saturate(145%);
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(18, 48, 72, 0.09), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+            animation: glassEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes glassEnter {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background-color: #01579b; color: #ffffff; padding: 16px; font-size: 0.9rem; font-weight: 600; }
-        td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; color: #334155; }
-        tr:hover { background-color: #f8fafc; }
+        thead th {
+            background: rgba(255, 255, 255, 0.45);
+            color: #334155;
+            padding: 15px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        tbody td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+            font-size: 0.88rem;
+            color: #0f172a;
+            vertical-align: middle;
+        }
+        tbody tr:hover { background: rgba(255, 255, 255, 0.35); }
 
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
-        .badge-pending { background-color: #fef3c7; color: #b45309; }
-        .badge-success { background-color: #dcfce7; color: #15803d; }
-        .badge-danger { background-color: #fee2e2; color: #b91c1c; }
+        .badge { padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-block; }
+        .badge-pending { background: rgba(245, 158, 11, 0.2); color: #92400e; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #065f46; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #991b1b; border: 1px solid rgba(239, 68, 68, 0.4); }
 
-        .btn-acc { padding: 6px 14px; background-color: #16a34a; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
-        .btn-acc:hover { background-color: #15803d; }
-        .btn-bukti { color: #0288d1; font-weight: 600; text-decoration: none; }
-        .btn-bukti:hover { text-decoration: underline; }
+        .btn-acc {
+            padding: 8px 14px; background: #16a34a; color: #fff; text-decoration: none;
+            border-radius: 10px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); transition: 0.2s;
+        }
+        .btn-acc:hover { background: #15803d; transform: translateY(-2px); }
+        .btn-bukti {
+            color: #0369a1; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(255, 255, 255, 0.75); border: 1px solid #ffffff; padding: 6px 12px; border-radius: 9px;
+        }
+        .btn-bukti:hover { background: #ffffff; }
+
+        .sidebar-backdrop {
+            display: none; position: fixed; inset: 0; background: rgba(15, 35, 52, 0.45);
+            backdrop-filter: blur(4px); z-index: 998;
+        }
+        .sidebar-backdrop.show { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed; top: 0; left: 0; bottom: 0; width: 270px; z-index: 999;
+                transform: translateX(-100%);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .btn-close-sidebar { display: inline-flex; align-items: center; justify-content: center; }
+            .btn-hamburger { display: inline-flex; }
+            .main-content { padding: 18px 16px 32px; }
+            .topbar-title h1 { font-size: 1.25rem; }
+            .topbar-title p { font-size: 0.8rem; }
+
+            .glass-table-wrap { background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
+
+            tbody tr {
+                background: linear-gradient(145deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.45) 100%);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                border-radius: 18px;
+                padding: 16px;
+                margin-bottom: 14px;
+                box-shadow: 0 8px 24px rgba(18, 48, 72, 0.08);
+            }
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+                padding: 9px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+                text-align: right;
+                word-break: break-word;
+            }
+            tbody td:last-child { border-bottom: none; padding-bottom: 0; flex-direction: column; align-items: stretch; text-align: center; }
+            tbody td::before {
+                content: attr(data-label);
+                font-size: 0.78rem;
+                font-weight: 700;
+                color: #475569;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            .btn-acc { width: 100%; justify-content: center; padding: 10px; }
+        }
     </style>
 </head>
 <body>
 
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
 <div class="admin-layout">
-    <aside class="sidebar">
-        <div class="sidebar-brand">Panel Admin</div>
+    <aside class="sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap">
+                <img src="{{ url_for('static', filename='image/logo-transparent.png') }}" alt="Logo">
+                <div class="brand-text">
+                    <h2>TK Tadika Puri</h2>
+                    <span>Panel Admin PPDB</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+        </div>
+
         <ul class="sidebar-menu">
-            <li><a href="/admin_dashboard">📊 Dashboard</a></li>
-            <li><a href="/data_siswa">👥 Data Siswa</a></li>
-            <li><a href="/data_pembayaran" class="active">💳 Data Pembayaran</a></li>
-            <li><a href="/cetak_pdf" target="_blank">📄 Cetak PDF</a></li>
-            <li><a href="/">🏠 Halaman Utama</a></li>
-            <li style="margin-top: auto;"><a href="/logout" style="color: #fca5a5;">🚪 Logout</a></li>
+            <li>
+                <a href="/admin_dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/data_siswa">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Data Siswa
+                </a>
+            </li>
+            <li>
+                <a href="/data_pembayaran" class="active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                    Data Pembayaran
+                </a>
+            </li>
+            <li>
+                <a href="/cetak_pdf" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Cetak Laporan PDF
+                </a>
+            </li>
+            <li>
+                <a href="/">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Halaman Utama
+                </a>
+            </li>
         </ul>
+
+        <div class="sidebar-footer">
+            <a href="/logout" class="btn-logout">🚪 Keluar Akun</a>
+        </div>
     </aside>
 
     <main class="main-content">
-        <div class="header-title">
-            <h1>Verifikasi Pembayaran PPDB</h1>
-            <p>Daftar bukti transfer yang dikirim oleh calon siswa untuk diverifikasi.</p>
-        </div>
+        <header class="topbar">
+            <button type="button" class="btn-hamburger" onclick="toggleSidebar()" aria-label="Buka Menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="topbar-title">
+                <h1>Verifikasi Pembayaran</h1>
+                <p>Periksa bukti transfer calon siswa sebelum menyetujui</p>
+            </div>
+        </header>
 
-        <div class="table-card">
+        <div class="glass-table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th style="width: 50px;">No</th>
                         <th>Email Pendaftar</th>
-                        <th>Foto Bukti Bayar</th>
-                        <th>Status Pembayaran</th>
+                        <th>Bukti Transfer</th>
+                        <th>Status</th>
                         <th>Aksi Verifikasi</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in pembayaran %}
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><b>{{ row[1] if row[1] else '-' }}</b></td>
-                        <td>
-                            {% if row[2] %}
-                            <a href="{{ url_for('static', filename='bukti/' + row[2]) }}" target="_blank" class="btn-bukti">🔍 Lihat Bukti Transfer</a>
+                        <td data-label="No. Urut"><b>#{{ loop.index }}</b></td>
+                        <td data-label="Email Pendaftar"><b>{{ row.email or '-' }}</b></td>
+                        <td data-label="Bukti Bayar">
+                            {% if row.bukti %}
+                                <a href="{{ url_for('static', filename='bukti/' ~ row.bukti) }}" target="_blank" class="btn-bukti">🔍 Lihat Foto</a>
                             {% else %}
-                            <span style="color: #94a3b8;">Tidak ada file</span>
+                                <span style="color: #64748b;">Tidak ada file</span>
                             {% endif %}
                         </td>
-                        <td>
-                            {% if row[3] == 'Lunas' or row[3] == 'Disetujui' %}
+                        <td data-label="Status">
+                            {% if row.status in ['Lunas', 'Disetujui'] %}
                                 <span class="badge badge-success">Lunas / Disetujui</span>
-                            {% elif row[3] == 'Ditolak' %}
+                            {% elif row.status == 'Ditolak' %}
                                 <span class="badge badge-danger">Ditolak</span>
                             {% else %}
                                 <span class="badge badge-pending">Menunggu Verifikasi</span>
                             {% endif %}
                         </td>
-                        <td>
-                            {% if row[3] != 'Lunas' and row[3] != 'Disetujui' %}
-                                <a href="/acc/{{ row[0] }}" class="btn-acc">✓ Setujui Pembayaran</a>
+                        <td data-label="Aksi">
+                            {% if row.status not in ['Lunas', 'Disetujui'] %}
+                                <a href="/acc/{{ row.id_pembayaran }}" class="btn-acc">✓ Setujui Pembayaran</a>
                             {% else %}
-                                <span style="color: #16a34a; font-weight: 600; font-size: 0.85rem;">Terverifikasi</span>
+                                <span style="color: #059669; font-weight: 700; font-size: 0.85rem;">✅ Terverifikasi</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">Belum ada data pembayaran masuk.</td>
+                        <td colspan="5" style="text-align: center; color: #475569; padding: 28px;">Belum ada data pembayaran masuk.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -117,5 +304,11 @@
     </main>
 </div>
 
+<script>
+    function toggleSidebar() {
+        document.getElementById('adminSidebar').classList.toggle('open');
+        document.getElementById('sidebarBackdrop').classList.toggle('show');
+    }
+</script>
 </body>
 </html>

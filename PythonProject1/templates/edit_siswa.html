@@ -1,39 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-    <title>Edit Siswa</title>
-    <head>
-    <title>Login TK Tadika Puri</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Data Siswa - Admin TK Tadika Puri</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/logo-transparent.png') }}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #082f49 0%, #0369a1 50%, #0ea5e9 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            padding: 32px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 12px 36px rgba(2, 24, 43, 0.2);
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18); padding-bottom: 18px; margin-bottom: 24px;
+        }
+        .header h1 { color: #ffffff; font-size: 1.4rem; font-weight: 700; }
+        .btn-back {
+            padding: 9px 16px; background: rgba(255, 255, 255, 0.18); color: #fff; text-decoration: none;
+            border-radius: 12px; font-weight: 600; font-size: 0.84rem; border: 1px solid rgba(255, 255, 255, 0.28);
+            white-space: nowrap;
+        }
+        .btn-back:hover { background: rgba(255, 255, 255, 0.28); }
+
+        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .info-group label { display: block; font-size: 0.78rem; color: #bae6fd; font-weight: 600; margin-bottom: 5px; }
+        .info-group p {
+            font-size: 0.92rem; font-weight: 600; color: #ffffff;
+            background: rgba(8, 33, 56, 0.35); padding: 11px 14px;
+            border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .berkas-section { margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.18); padding-top: 20px; }
+        .berkas-section h3 { color: #ffffff; font-size: 1.05rem; margin-bottom: 14px; }
+        .berkas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .berkas-card {
+            border: 1px solid rgba(255, 255, 255, 0.22); padding: 18px 14px; border-radius: 16px;
+            text-align: center; background: rgba(255, 255, 255, 0.1);
+        }
+        .berkas-card a {
+            display: inline-block; margin-top: 10px; padding: 7px 14px; border-radius: 10px;
+            background: #ffffff; color: #0369a1; font-weight: 600; text-decoration: none; font-size: 0.82rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .container { padding: 20px 16px; border-radius: 20px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header h1 { font-size: 1.2rem; }
+            .btn-back { width: 100%; text-align: center; }
+            .grid-info { grid-template-columns: 1fr; gap: 12px; }
+            .grid-info .info-group { grid-column: span 1 !important; }
+            .berkas-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-<div class="login-box">
-    <h2>Edit Data Siswa</h2>
-    <form method="POST">
-        <input type="text"
-        name="nama_siswa"
-        value="{{ siswa[1] }}">
-        <input type="date"
-        name="tanggal_lahir"
-        value="{{ siswa[2] }}">
-        <select name="jenis_kelamin">
-            <option>{{ siswa[3] }}</option>
-            <option>Laki-laki</option>
-            <option>Perempuan</option>
-        </select>
-        <textarea
-        name="alamat">{{ siswa[4] }}</textarea>
-        <button type="submit">
-            Update
-        </button>
-    </form>
+
+<div class="container">
+    <div class="header">
+        <h1>Detail Formulir & Berkas Siswa</h1>
+        <a href="/data_siswa" class="btn-back">← Kembali ke Data Siswa</a>
+    </div>
+
+    <div class="grid-info">
+        <div class="info-group">
+            <label>Nama Lengkap Siswa</label>
+            <p>{{ siswa.nama_siswa or '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Nama Panggilan</label>
+            <p>{{ siswa.nama_panggilan or '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Tempat, Tanggal Lahir</label>
+            <p>{{ siswa.tempat_lahir or 'Depok' }}, {{ siswa.tanggal_lahir or '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Jenis Kelamin</label>
+            <p>{{ siswa.jenis_kelamin or '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Agama</label>
+            <p>{{ siswa.agama or '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Tinggi & Berat Badan</label>
+            <p>{{ siswa.tinggi_badan or '-' }} cm / {{ siswa.berat_badan or '-' }} kg</p>
+        </div>
+        <div class="info-group" style="grid-column: span 2;">
+            <label>Alamat Lengkap Domisili</label>
+            <p>{{ siswa.alamat or '-' }}</p>
+        </div>
+        <div class="info-group">
+            <label>Data Ayah</label>
+            <p>{{ siswa.nama_ayah or '-' }} ({{ siswa.pekerjaan_ayah or '-' }})</p>
+        </div>
+        <div class="info-group">
+            <label>Data Ibu</label>
+            <p>{{ siswa.nama_ibu or '-' }} ({{ siswa.pekerjaan_ibu or '-' }})</p>
+        </div>
+    </div>
+
+    <div class="berkas-section">
+        <h3>Lampiran Dokumen Pendaftar</h3>
+        <div class="berkas-grid">
+            <div class="berkas-card">
+                <strong>Kartu Keluarga (KK)</strong><br>
+                {% if siswa.file_kk %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.file_kk) }}" target="_blank">🔍 Buka Berkas KK</a>
+                {% else %}
+                    <div style="margin-top: 8px; color: #bae6fd; font-size: 0.82rem;">Tidak diunggah</div>
+                {% endif %}
+            </div>
+            <div class="berkas-card">
+                <strong>Akta Kelahiran</strong><br>
+                {% if siswa.file_akta %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.file_akta) }}" target="_blank">🔍 Buka Akta</a>
+                {% else %}
+                    <div style="margin-top: 8px; color: #bae6fd; font-size: 0.82rem;">Tidak diunggah</div>
+                {% endif %}
+            </div>
+            <div class="berkas-card">
+                <strong>Foto Siswa</strong><br>
+                {% if siswa.foto %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.foto) }}" target="_blank">🔍 Buka Foto</a>
+                {% else %}
+                    <div style="margin-top: 8px; color: #bae6fd; font-size: 0.82rem;">Tidak diunggah</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
+
 </body>
 </html>

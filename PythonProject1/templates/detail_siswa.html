@@ -3,71 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Data Siswa - Admin</title>
+    <title>Detail Data Siswa - Admin TK Tadika Puri</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/logo-transparent.png') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; padding: 40px; }
-        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 24px; }
-        .header h1 { color: #01579b; font-size: 1.5rem; }
-        .btn-back { padding: 8px 16px; background-color: #64748b; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
-        
-        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-        .info-group label { display: block; font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 4px; }
-        .info-group p { font-size: 0.95rem; font-weight: 600; color: #0f172a; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 18%, #638da5 0%, transparent 45%),
+                radial-gradient(circle at 85% 22%, #c3dfee 0%, transparent 52%),
+                linear-gradient(135deg, #5c859d 0%, #99c1d6 48%, #d7e9f3 100%);
+            background-attachment: fixed;
+            color: #0f172a;
+            padding: 32px 20px;
+        }
+        .container {
+            max-width: 900px; margin: 0 auto;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.45) 100%);
+            backdrop-filter: blur(24px) saturate(145%);
+            -webkit-backdrop-filter: blur(24px) saturate(145%);
+            padding: 30px; border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 12px 36px rgba(18, 48, 72, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+            animation: glassEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes glassEnter {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.65); padding-bottom: 18px; margin-bottom: 24px;
+        }
+        .header h1 { color: #0f172a; font-size: 1.4rem; font-weight: 700; }
+        .btn-back {
+            padding: 9px 16px; background: rgba(255, 255, 255, 0.8); color: #0f172a; text-decoration: none;
+            border-radius: 12px; font-weight: 600; font-size: 0.84rem; border: 1px solid #ffffff;
+            white-space: nowrap; transition: 0.2s;
+        }
+        .btn-back:hover { background: #ffffff; transform: translateY(-2px); }
 
-        .berkas-section { margin-top: 24px; border-top: 1.5px solid #e2e8f0; padding-top: 20px; }
-        .berkas-section h3 { color: #01579b; font-size: 1.1rem; margin-bottom: 16px; }
-        .berkas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .berkas-card { border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; text-align: center; background: #f8fafc; }
-        .berkas-card a { display: inline-block; margin-top: 8px; color: #0288d1; font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .info-group label { display: block; font-size: 0.78rem; color: #475569; font-weight: 600; margin-bottom: 5px; }
+        .info-group p {
+            font-size: 0.92rem; font-weight: 600; color: #0f172a;
+            background: rgba(255, 255, 255, 0.58); padding: 11px 14px;
+            border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.85);
+        }
+
+        .berkas-section { margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.65); padding-top: 20px; }
+        .berkas-section h3 { color: #0f172a; font-size: 1.05rem; margin-bottom: 14px; }
+        .berkas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .berkas-card {
+            border: 1px solid rgba(255, 255, 255, 0.8); padding: 18px 14px; border-radius: 16px;
+            text-align: center; background: rgba(255, 255, 255, 0.52);
+        }
+        .berkas-card a {
+            display: inline-block; margin-top: 10px; padding: 7px 14px; border-radius: 10px;
+            background: #0284c7; color: #ffffff; font-weight: 600; text-decoration: none; font-size: 0.82rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .container { padding: 20px 16px; border-radius: 20px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header h1 { font-size: 1.2rem; }
+            .btn-back { width: 100%; text-align: center; }
+            .grid-info { grid-template-columns: 1fr; gap: 12px; }
+            .grid-info .info-group { grid-column: span 1 !important; }
+            .berkas-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>Detail Formulir & Berkas Pendaftaran</h1>
+        <h1>Detail Formulir & Berkas Siswa</h1>
         <a href="/data_siswa" class="btn-back">← Kembali ke Data Siswa</a>
     </div>
 
     <div class="grid-info">
         <div class="info-group">
             <label>Nama Lengkap Siswa</label>
-            <p>{{ siswa[1] if siswa[1] else '-' }}</p>
+            <p>{{ siswa.nama_siswa or '-' }}</p>
         </div>
         <div class="info-group">
             <label>Nama Panggilan</label>
-            <p>{{ siswa[2] if siswa[2] else '-' }}</p>
+            <p>{{ siswa.nama_panggilan or '-' }}</p>
         </div>
         <div class="info-group">
             <label>Tempat, Tanggal Lahir</label>
-            <p>{{ siswa[3] if siswa[3] else '-' }}, {{ siswa[4] if siswa[4] else '-' }}</p>
+            <p>{{ siswa.tempat_lahir or 'Depok' }}, {{ siswa.tanggal_lahir or '-' }}</p>
         </div>
         <div class="info-group">
             <label>Jenis Kelamin</label>
-            <p>{{ siswa[5] if siswa[5] else '-' }}</p>
+            <p>{{ siswa.jenis_kelamin or '-' }}</p>
         </div>
         <div class="info-group">
             <label>Agama</label>
-            <p>{{ siswa[6] if siswa[6] else '-' }}</p>
+            <p>{{ siswa.agama or '-' }}</p>
         </div>
         <div class="info-group">
             <label>Tinggi & Berat Badan</label>
-            <p>{{ siswa[8] if siswa[8] else '-' }} cm / {{ siswa[9] if siswa[9] else '-' }} kg</p>
+            <p>{{ siswa.tinggi_badan or '-' }} cm / {{ siswa.berat_badan or '-' }} kg</p>
         </div>
         <div class="info-group" style="grid-column: span 2;">
             <label>Alamat Lengkap Domisili</label>
-            <p>{{ siswa[7] if siswa[7] else '-' }}</p>
+            <p>{{ siswa.alamat or '-' }}</p>
         </div>
         <div class="info-group">
             <label>Data Ayah</label>
-            <p>{{ siswa[10] if siswa[10] else '-' }} ({{ siswa[11] if siswa[11] else '-' }})</p>
+            <p>{{ siswa.nama_ayah or '-' }} ({{ siswa.pekerjaan_ayah or '-' }})</p>
         </div>
         <div class="info-group">
             <label>Data Ibu</label>
-            <p>{{ siswa[12] if siswa[12] else '-' }} ({{ siswa[13] if siswa[13] else '-' }})</p>
+            <p>{{ siswa.nama_ibu or '-' }} ({{ siswa.pekerjaan_ibu or '-' }})</p>
         </div>
     </div>
 
@@ -76,21 +128,27 @@
         <div class="berkas-grid">
             <div class="berkas-card">
                 <strong>Kartu Keluarga (KK)</strong><br>
-                {% if siswa[14] and ('.' in siswa[14]) %}
-                <a href="{{ url_for('static', filename='uploads/' + siswa[14]) }}" target="_blank">🔍 Buka Berkas KK</a>
-                {% else %} <span style="color: #94a3b8; font-size: 0.85rem;">Tidak diunggah / Kosong</span> {% endif %}
+                @if siswa.file_kk %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.file_kk) }}" target="_blank">🔍 Buka Berkas KK</a>
+                {% else %}
+                    <div style="margin-top: 8px; color: #64748b; font-size: 0.82rem;">Tidak diunggah</div>
+                {% endif %}
             </div>
             <div class="berkas-card">
                 <strong>Akta Kelahiran</strong><br>
-                {% if siswa[15] and ('.' in siswa[15]) %}
-                <a href="{{ url_for('static', filename='uploads/' + siswa[15]) }}" target="_blank">🔍 Buka Akta</a>
-                {% else %} <span style="color: #94a3b8; font-size: 0.85rem;">Tidak diunggah / Kosong</span> {% endif %}
+                {% if siswa.file_akta %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.file_akta) }}" target="_blank">🔍 Buka Akta</a>
+                {% else %}
+                    <div style="margin-top: 8px; color: #64748b; font-size: 0.82rem;">Tidak diunggah</div>
+                {% endif %}
             </div>
             <div class="berkas-card">
                 <strong>Foto Siswa</strong><br>
-                {% if siswa[16] and ('.' in siswa[16]) %}
-                <a href="{{ url_for('static', filename='uploads/' + siswa[16]) }}" target="_blank">🔍 Buka Foto</a>
-                {% else %} <span style="color: #94a3b8; font-size: 0.85rem;">Tidak diunggah / Kosong</span> {% endif %}
+                {% if siswa.foto %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.foto) }}" target="_blank">🔍 Buka Foto</a>
+                {% else %}
+                    <div style="margin-top: 8px; color: #64748b; font-size: 0.82rem;">Tidak diunggah</div>
+                {% endif %}
             </div>
         </div>
     </div>
