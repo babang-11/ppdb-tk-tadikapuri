@@ -31,18 +31,19 @@
 
         /* SIDEBAR */
         .sidebar {
-            width: 260px;
-            background-color: #01579b;
+            width: 265px;
+            background: linear-gradient(180deg, #0277bd 0%, #01579b 100%);
             color: #ffffff;
-            padding: 24px 16px;
+            padding: 26px 18px;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
         }
 
         .sidebar-brand {
             font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             padding: 0 12px;
             color: #ffffff;
         }
@@ -61,13 +62,71 @@
             padding: 12px 16px;
             color: #e0f2fe;
             text-decoration: none;
+            font-size: 0.92rem;
             font-weight: 500;
             border-radius: 12px;
             transition: all 0.2s ease;
         }
 
         .sidebar-menu a:hover, .sidebar-menu a.active {
-            background-color: #0288d1;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* BAGIAN BAWAH SIDEBAR */
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-top: 20px;
+        }
+
+        .wali-card {
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 0.8rem;
+            color: #ffffff;
+        }
+
+        .wali-card small {
+            display: block;
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
+
+        .wali-card strong {
+            display: block;
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+        }
+
+        .wali-card p {
+            font-size: 0.76rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .btn-logout-side {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: #fecaca;
+            background: rgba(239, 68, 68, 0.16);
+            border: 1px solid rgba(252, 165, 165, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout-side:hover {
+            background: rgba(239, 68, 68, 0.3);
             color: #ffffff;
         }
 
@@ -75,6 +134,7 @@
         .main-content {
             flex: 1;
             padding: 36px 40px;
+            min-width: 0;
         }
 
         .header-user {
@@ -120,6 +180,18 @@
             color: #92400e;
         }
 
+        .status-badge-wrapper.lunas {
+            background-color: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .status-badge-wrapper.ditolak {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
         .status-badge-icon {
             font-size: 1.5rem;
         }
@@ -131,13 +203,13 @@
 
         .status-badge-desc {
             font-size: 0.85rem;
-            color: #b45309;
+            opacity: 0.9;
         }
 
         /* SUMMARY GRID */
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
         }
 
@@ -160,6 +232,13 @@
             font-weight: 600;
             color: #0f172a;
         }
+
+        @media (max-width: 768px) {
+            .dashboard-layout { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .wali-card { display: none; }
+            .main-content { padding: 24px 18px; }
+        }
     </style>
 </head>
 <body>
@@ -171,9 +250,18 @@
         <ul class="sidebar-menu">
             <li><a href="/dashboard" class="active">📊 Dashboard Status</a></li>
             <li><a href="/status_pembayaran">💳 Status Pembayaran</a></li>
+            <li><a href="/tagihan_spp">🧾 Tagihan SPP Bulanan</a></li>
             <li><a href="/">🏠 Halaman Utama</a></li>
-            <li style="margin-top: auto;"><a href="/logout" style="color: #fca5a5;">🚪 Logout</a></li>
         </ul>
+
+        <div class="sidebar-bottom">
+            <div class="wali-card">
+                <small>Akun Wali Murid</small>
+                <strong>{{ nama }}</strong>
+                <p>Jam Layanan Admin:<br>Senin – Jumat, 08.00 – 15.00 WIB<br>WA: 0812-3456-7890</p>
+            </div>
+            <a href="/logout" class="btn-logout-side">🚪 Logout</a>
+        </div>
     </aside>
 
     <!-- KONTEN UTAMA DASHBOARD -->
@@ -186,13 +274,31 @@
         <!-- STATUS PENDAFTARAN SAAT INI -->
         <div class="status-card">
             <div class="status-header">Status Pendaftaran & Pembayaran</div>
-            <div class="status-badge-wrapper">
-                <div class="status-badge-icon">⏳</div>
-                <div>
-                    <div class="status-badge-title">{{ status }}</div>
-                    <div class="status-badge-desc">Bukti pembayaran Anda sedang diverifikasi oleh panitia PPDB. Hasil konfirmasi akan kami kirimkan via WhatsApp / Email terdaftar.</div>
+            {% if status == 'Lunas' %}
+                <div class="status-badge-wrapper lunas">
+                    <div class="status-badge-icon">✅</div>
+                    <div>
+                        <div class="status-badge-title">Lunas & Terverifikasi</div>
+                        <div class="status-badge-desc">Selamat! Pembayaran pendaftaran PPDB Anda telah disetujui. Anda dapat mengunduh Surat Penerimaan di menu Status Pembayaran atau membayar SPP bulanan di menu Tagihan SPP Bulanan.</div>
+                    </div>
                 </div>
-            </div>
+            {% elif status == 'Ditolak' %}
+                <div class="status-badge-wrapper ditolak">
+                    <div class="status-badge-icon">❌</div>
+                    <div>
+                        <div class="status-badge-title">Pembayaran Ditolak</div>
+                        <div class="status-badge-desc">Bukti transfer tidak valid atau nominal tidak sesuai. Silakan unggah ulang bukti pembayaran yang benar.</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="status-badge-wrapper">
+                    <div class="status-badge-icon">⏳</div>
+                    <div>
+                        <div class="status-badge-title">{{ status }}</div>
+                        <div class="status-badge-desc">Bukti pembayaran Anda sedang diverifikasi oleh panitia PPDB. Hasil konfirmasi akan kami kirimkan via WhatsApp / Email terdaftar.</div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         <!-- RINGKASAN INFORMASI PENDAFTAR -->
@@ -203,7 +309,7 @@
             </div>
             <div class="info-box">
                 <h3>Tahap Selanjutnya</h3>
-                <p>Verifikasi Berkas & Wawancara</p>
+                <p>{{ 'Pembayaran SPP & Daftar Ulang' if status == 'Lunas' else 'Verifikasi Berkas & Wawancara' }}</p>
             </div>
             <div class="info-box">
                 <h3>Bantuan Admin</h3>

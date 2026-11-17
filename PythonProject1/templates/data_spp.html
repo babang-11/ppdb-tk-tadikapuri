@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data SPP Bulanan - Admin TK Tadika Puri</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            padding: 28px 18px;
+            color: #1e293b;
+        }
+        .container { max-width: 1120px; margin: 0 auto; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 22px;
+            background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(12px);
+            padding: 18px 24px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+        }
+        .topbar h1 { font-size: 21px; color: #0369a1; }
+        .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav-links a {
+            text-decoration: none; font-size: 13px; font-weight: 600;
+            padding: 8px 14px; border-radius: 10px; color: #0369a1; background: #e0f2fe;
+        }
+        .nav-links a.active { background: #0284c7; color: #fff; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(14px);
+            border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.95);
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        th {
+            background: #0284c7; color: #fff; padding: 13px 12px; text-align: left; font-weight: 600;
+        }
+        th:first-child { border-radius: 12px 0 0 12px; }
+        th:last-child { border-radius: 0 12px 12px 0; }
+        td { padding: 13px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        .badge { padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .badge-lunas { background: #dcfce7; color: #15803d; }
+        .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-tolak { background: #fee2e2; color: #b91c1c; }
+
+        .btn-aksi {
+            text-decoration: none; padding: 6px 11px; border-radius: 8px;
+            font-size: 12px; font-weight: 600; display: inline-block; margin-right: 4px;
+        }
+        .btn-lihat { background: #e0f2fe; color: #0369a1; }
+        .btn-acc { background: #16a34a; color: #fff; }
+        .btn-tolak { background: #dc2626; color: #fff; }
+
+        @media (max-width: 768px) {
+            thead { display: none; }
+            table, tbody, tr, td { display: block; width: 100%; }
+            tbody tr { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid #cbd5e1; }
+            tbody td { display: flex; justify-content: space-between; border: none; padding: 6px 0; }
+            tbody td::before { content: attr(data-label); font-weight: 700; color: #64748b; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <h1>Verifikasi Pembayaran SPP Bulanan</h1>
+        <div class="nav-links">
+            <a href="/admin_dashboard">Dashboard</a>
+            <a href="/data_siswa">Data Siswa</a>
+            <a href="/data_pembayaran">Pembayaran PPDB</a>
+            <a href="/data_spp" class="active">Data SPP Bulanan</a>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        {% if data_spp %}
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Siswa & Email</th>
+                    <th>Bulan SPP</th>
+                    <th>Nominal</th>
+                    <th>Bank</th>
+                    <th>Bukti</th>
+                    <th>Status</th>
+                    <th>Aksi Verifikasi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data_spp %}
+                <tr>
+                    <td data-label="No">{{ loop.index }}</td>
+                    <td data-label="Siswa">
+                        <strong>{{ row['nama_siswa'] }}</strong><br>
+                        <small style="color:#64748b;">{{ row['email'] }}</small>
+                    </td>
+                    <td data-label="Bulan SPP"><strong>{{ row['bulan'] }}</strong></td>
+                    <td data-label="Nominal"><strong>Rp {{ "{:,.0f}".format(row['nominal']).replace(',', '.') }}</strong></td>
+                    <td data-label="Bank">{{ row['metode_pembayaran'] }}</td>
+                    <td data-label="Bukti">
+                        <a href="{{ url_for('static', filename='bukti/' + row['bukti']) }}" target="_blank" class="btn-aksi btn-lihat">Lihat Struk</a>
+                    </td>
+                    <td data-label="Status">
+                        {% if row['status'] == 'Lunas' %}
+                            <span class="badge badge-lunas">Lunas</span>
+                        {% elif row['status'] == 'Ditolak' %}
+                            <span class="badge badge-tolak">Ditolak</span>
+                        {% else %}
+                            <span class="badge badge-pending">Menunggu Verifikasi</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Aksi">
+                        <a href="/verifikasi_spp/{{ row['id_spp'] }}/Lunas" class="btn-aksi btn-acc">Terima</a>
+                        <a href="/verifikasi_spp/{{ row['id_spp'] }}/Ditolak" class="btn-aksi btn-tolak">Tolak</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="text-align:center; color:#64748b; padding:24px;">Belum ada data pembayaran SPP bulanan yang masuk.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

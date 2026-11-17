@@ -4,229 +4,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembayaran PPDB - TK Tadika Puri</title>
-
-    <!-- Google Fonts Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Panggil File CSS Utama -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
     <style>
-        .payment-wrapper {
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #dbeafe 100%);
             min-height: 100vh;
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
-            padding: 60px 24px;
+            padding: 36px 16px;
+            color: #1e293b;
         }
+        .container { max-width: 860px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 26px; }
+        .header img { width: 58px; height: 58px; object-fit: contain; margin-bottom: 10px; }
+        .header h1 { color: #0369a1; font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+        .header p { color: #64748b; font-size: 14px; }
 
-        .payment-container {
-            max-width: 800px;
-            margin: 0 auto;
+        /* Kartu Ringkasan Tagihan Sesuai Formulir */
+        .bill-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px 28px;
+            box-shadow: 0 10px 28px rgba(2, 132, 199, 0.10);
+            border: 1px solid #bae6fd;
+            margin-bottom: 22px;
         }
-
-        .payment-header {
-            text-align: center;
-            margin-bottom: 36px;
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-
-        .payment-header img {
-            height: 55px;
-            margin-bottom: 12px;
-        }
-
-        .payment-title {
-            color: #01579b;
-            font-size: 2.2rem;
+        .bill-header h2 { font-size: 17px; color: #0f172a; }
+        .badge-kelas {
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 12px;
             font-weight: 700;
+            background: #e0f2fe;
+            color: #0284c7;
         }
-
-        .payment-subtitle {
-            color: #64748b;
-            font-size: 1rem;
-            margin-top: 6px;
+        .badge-inklusi {
+            background: #fef3c7;
+            color: #b45309;
         }
+        .bill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px 24px;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+        .bill-item span { display: block; color: #64748b; font-size: 12px; margin-bottom: 2px; }
+        .bill-item strong { color: #0f172a; font-size: 14px; }
 
-        /* CARD PILIHAN BANK */
+        .total-box {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .total-box small { display: block; font-size: 12px; opacity: 0.9; }
+        .total-amount { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; }
+        .btn-copy-nominal {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-copy-nominal:hover { background: rgba(255, 255, 255, 0.32); }
+
+        /* Kartu Rekening Bank */
         .bank-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
         }
-
         .bank-card {
-            background-color: #ffffff;
-            border-radius: 20px;
-            padding: 24px 20px;
-            border: 2px solid #e0f2fe;
-            box-shadow: 0 8px 20px rgba(2, 136, 209, 0.08);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .bank-card:hover {
-            border-color: #0288d1;
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px rgba(2, 136, 209, 0.15);
-        }
-
-        .bank-name {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #0288d1;
-            margin-bottom: 8px;
-        }
-
-        .bank-number {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .bank-holder {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-bottom: 16px;
-        }
-
-        .btn-copy {
-            background-color: #e0f2fe;
-            color: #0288d1;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-copy:hover {
-            background-color: #0288d1;
-            color: #ffffff;
-        }
-
-        /* FORM UNGGAH BUKTI */
-        .upload-card {
             background: #ffffff;
-            padding: 40px 32px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(2, 136, 209, 0.12);
-            border: 1px solid #e0f2fe;
-        }
-
-        .upload-card h3 {
-            color: #01579b;
-            margin-bottom: 24px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .file-input-wrapper {
-            margin-bottom: 24px;
-        }
-
-        .file-input-wrapper label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 8px;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1.5px dashed #0288d1;
             border-radius: 16px;
-            background-color: #f8fafc;
-            cursor: pointer;
-            font-size: 0.9rem;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
+        .bank-card h3 { color: #0284c7; font-size: 15px; margin-bottom: 8px; }
+        .bank-card .rek { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .bank-card .an { font-size: 12px; color: #64748b; margin-bottom: 14px; }
+        .btn-copy {
+            background: #e0f2fe;
+            color: #0284c7;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-copy:hover { background: #bae6fd; }
 
-        .btn-submit-pay {
+        /* Form Konfirmasi Pembayaran */
+        .confirm-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 26px 28px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+        }
+        .confirm-card h2 { text-align: center; color: #0f172a; font-size: 19px; margin-bottom: 18px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; }
+        .form-control {
             width: 100%;
-            padding: 14px;
-            background-color: #0288d1;
+            padding: 11px 14px;
+            border: 1.5px dashed #94a3b8;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+        select.form-control { border-style: solid; border-color: #cbd5e1; }
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
             color: #ffffff;
             border: none;
-            border-radius: 30px;
-            font-size: 1rem;
+            padding: 13px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.25);
-            transition: all 0.3s ease;
+            margin-top: 6px;
         }
+        .btn-submit:hover { opacity: 0.94; }
 
-        .btn-submit-pay:hover {
-            background-color: #01579b;
-            transform: translateY(-2px);
+        @media (max-width: 768px) {
+            .bank-grid { grid-template-columns: 1fr; }
+            .bill-grid { grid-template-columns: 1fr; }
+            .total-amount { font-size: 22px; }
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <div class="header">
+        <img src="{{ url_for('static', filename='image/logo-transparent.png') }}" alt="Logo TK Tadika Puri">
+        <h1>Pembayaran Biaya PPDB</h1>
+        <p>Silakan transfer biaya pendaftaran sesuai program pilihan Anda ke salah satu rekening bank resmi di bawah ini:</p>
+    </div>
 
-<div class="payment-wrapper">
-    <div class="payment-container">
-        <div class="payment-header">
-            <img src="{{ url_for('static', filename='image/logo-transparent.png') }}" alt="Logo TK Tadika Puri">
-            <h1 class="payment-title">Pembayaran Biaya PPDB</h1>
-            <p class="payment-subtitle">Silakan transfer biaya pendaftaran ke salah satu rekening bank resmi di bawah ini:</p>
+    <!-- RINGKASAN PROGRAM & NOMINAL SESUAI FORMULIR -->
+    <div class="bill-card">
+        <div class="bill-header">
+            <h2>Rincian Program & Tagihan Pendaftaran</h2>
+            <span class="badge-kelas {{ 'badge-inklusi' if (siswa and siswa['kelas'] == 'Inklusi') else '' }}">
+                Kelas {{ siswa['kelas'] if (siswa and siswa['kelas']) else 'Reguler' }}
+            </span>
         </div>
 
-        <!-- DAFTAR REKENING BANK -->
-        <div class="bank-grid">
-            <!-- BANK BCA -->
-            <div class="bank-card">
-                <div class="bank-name">BANK BCA</div>
-                <div class="bank-number" id="rek-bca">1234567890</div>
-                <div class="bank-holder">a.n TK Tadika Puri</div>
-                <button class="btn-copy" onclick="copyRek('rek-bca')">📋 Salin Rekening</button>
+        <div class="bill-grid">
+            <div class="bill-item">
+                <span>Nama Calon Siswa</span>
+                <strong>{{ siswa['nama_siswa'] if siswa else session['nama'] }}</strong>
             </div>
-
-            <!-- BANK MANDIRI -->
-            <div class="bank-card">
-                <div class="bank-name">BANK MANDIRI</div>
-                <div class="bank-number" id="rek-mandiri">0987654321123</div>
-                <div class="bank-holder">a.n TK Tadika Puri</div>
-                <button class="btn-copy" onclick="copyRek('rek-mandiri')">📋 Salin Rekening</button>
+            <div class="bill-item">
+                <span>Jenjang Pendidikan</span>
+                <strong>{{ siswa['jenjang'] if (siswa and siswa['jenjang']) else 'Kinder A' }}</strong>
             </div>
-
-            <!-- BANK BRI -->
-            <div class="bank-card">
-                <div class="bank-name">BANK BRI</div>
-                <div class="bank-number" id="rek-bri">567801009988531</div>
-                <div class="bank-holder">a.n TK Tadika Puri</div>
-                <button class="btn-copy" onclick="copyRek('rek-bri')">📋 Salin Rekening</button>
+            <div class="bill-item">
+                <span>Tipe Program</span>
+                <strong>{{ siswa['tipe_program'] if (siswa and siswa['tipe_program']) else 'Tatap Muka Rutin' }}</strong>
+            </div>
+            <div class="bill-item">
+                <span>Rincian Tarif</span>
+                <strong>
+                    Rp {{ "{:,.0f}".format(rincian['biaya_program']).replace(',', '.') }}
+                    {% if rincian['biaya_kelas'] > 0 %}
+                        + Rp {{ "{:,.0f}".format(rincian['biaya_kelas']).replace(',', '.') }} (Kelas Inklusi)
+                    {% endif %}
+                </strong>
             </div>
         </div>
 
-        <!-- FORM UNGGAH BUKTI BAYAR -->
-        <div class="upload-card">
-            <h3>Konfirmasi Pembayaran</h3>
-            <form action="/pembayaran" method="POST" enctype="multipart/form-data">
-                <div class="file-input-wrapper">
-                    <label>Unggah Bukti Transfer (JPG/PNG) *</label>
-                    <input type="file" name="bukti" accept="image/*" required>
-                </div>
-
-                <button type="submit" class="btn-submit-pay">Kirim Bukti Pembayaran</button>
-            </form>
+        <div class="total-box">
+            <div>
+                <small>Total Nominal yang Harus Ditransfer</small>
+                <div class="total-amount">Rp {{ "{:,.0f}".format(rincian['total']).replace(',', '.') }}</div>
+            </div>
+            <button type="button" class="btn-copy-nominal" data-nominal="{{ rincian.total }}" onclick="salinNominal(this)">
+                Salin Nominal
+            </button>
         </div>
+    </div>
+
+    <!-- PILIHAN REKENING BANK -->
+    <div class="bank-grid">
+        <div class="bank-card">
+            <h3>BANK BCA</h3>
+            <div class="rek">1234567890</div>
+            <div class="an">a.n TK Tadika Puri</div>
+            <button type="button" class="btn-copy" onclick="salinTeks('1234567890', this)">Salin Rekening</button>
+        </div>
+        <div class="bank-card">
+            <h3>BANK MANDIRI</h3>
+            <div class="rek">0987654321123</div>
+            <div class="an">a.n TK Tadika Puri</div>
+            <button type="button" class="btn-copy" onclick="salinTeks('0987654321123', this)">Salin Rekening</button>
+        </div>
+        <div class="bank-card">
+            <h3>BANK BRI</h3>
+            <div class="rek">567801009988531</div>
+            <div class="an">a.n TK Tadika Puri</div>
+            <button type="button" class="btn-copy" onclick="salinTeks('567801009988531', this)">Salin Rekening</button>
+        </div>
+    </div>
+
+    <!-- FORM KONFIRMASI PEMBAYARAN -->
+    <div class="confirm-card">
+        <h2>Konfirmasi Pembayaran</h2>
+        <form action="{{ url_for('pembayaran') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Bank Tujuan Transfer *</label>
+                <select name="metode_pembayaran" class="form-control" required>
+                    <option value="Bank BCA">Bank BCA - 1234567890 (a.n TK Tadika Puri)</option>
+                    <option value="Bank Mandiri">Bank Mandiri - 0987654321123 (a.n TK Tadika Puri)</option>
+                    <option value="Bank BRI">Bank BRI - 567801009988531 (a.n TK Tadika Puri)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Unggah Bukti Transfer (JPG/PNG) *</label>
+                <input type="file" name="bukti" class="form-control" accept="image/png, image/jpeg, image/jpg" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Kirim Bukti Pembayaran</button>
+        </form>
     </div>
 </div>
 
 <script>
-    function copyRek(id) {
-        var rekText = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(rekText);
-        alert("Nomor rekening berhasil disalin: " + rekText);
+    function salinTeks(teks, btn) {
+        navigator.clipboard.writeText(teks).then(() => {
+            const labelAsli = btn.innerText;
+            btn.innerText = 'Tersalin!';
+            setTimeout(() => { btn.innerText = labelAsli; }, 1500);
+        });
+    }
+
+    function salinNominal(btn) {
+        const nominal = btn.getAttribute('data-nominal');
+        salinTeks(nominal, btn);
     }
 </script>
-
 </body>
 </html>

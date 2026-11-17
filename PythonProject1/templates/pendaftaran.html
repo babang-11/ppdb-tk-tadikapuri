@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lengkapi Data Siswa - TK Tadika Puri</title>
 
-    <!-- Google Fonts Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
@@ -20,7 +18,7 @@
         }
 
         .form-card-container {
-            max-width: 800px;
+            max-width: 840px;
             margin: 0 auto;
             background: #ffffff;
             padding: 40px 36px;
@@ -64,6 +62,12 @@
             gap: 18px;
         }
 
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
         .input-box {
             display: flex;
             flex-direction: column;
@@ -85,6 +89,7 @@
             font-size: 0.9rem;
             outline: none;
             transition: all 0.2s ease;
+            background-color: #ffffff;
         }
 
         .input-box input:focus, .input-box select:focus, .input-box textarea:focus {
@@ -103,6 +108,7 @@
             border: none;
             padding: 0;
             background: transparent;
+            font-size: 0.82rem;
         }
 
         .btn-submit-formal {
@@ -142,7 +148,7 @@
             <div class="grid-2">
                 <div class="input-box">
                     <label>Nama Lengkap Siswa *</label>
-                    <input type="text" name="nama" placeholder="Sesuai Akta Birth" required>
+                    <input type="text" name="nama" placeholder="Sesuai Akta Kelahiran" required>
                 </div>
                 <div class="input-box">
                     <label>Nama Panggilan *</label>
@@ -177,7 +183,47 @@
                 <textarea name="alamat" rows="3" placeholder="Masukkan alamat domisili lengkap" required></textarea>
             </div>
 
-            <!-- 2. DATA ORANG TUA -->
+            <!-- 2. PILIHAN PROGRAM & KELAS -->
+            <div class="section-group-title">🎓 Pilihan Program & Kelas Pendidikan</div>
+            <div class="grid-3">
+                <div class="input-box">
+                    <label>Jenjang Pendidikan *</label>
+                    <select name="jenjang" id="jenjang" required>
+                        <option value="Pre-Kinder">Pre-Kinder (Usia 3–4 Tahun)</option>
+                        <option value="Kinder A" selected>Kinder A (Usia 4–5 Tahun)</option>
+                        <option value="Kinder B">Kinder B (Usia 5–6 Tahun)</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <label>Tipe Program *</label>
+                    <select name="tipe_program" id="tipe_program" required>
+                        <option value="Tatap Muka Rutin" selected>Tatap Muka Rutin</option>
+                        <option value="Daring Rutin">Daring Rutin</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <label>Pilihan Kelas *</label>
+                    <select name="kelas" id="kelas" required>
+                        <option value="Reguler" selected>Kelas Reguler</option>
+                        <option value="Inklusi">Kelas Inklusi (+Pendampingan)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ESTIMASI BIAYA OTOMATIS -->
+            <div style="background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:14px; padding:16px 18px; margin:8px 0 18px; font-size:13px; color:#0f172a;">
+                <div style="font-weight:700; color:#0369a1; margin-bottom:4px;">Estimasi Biaya Pendaftaran Sesuai Pilihan Anda:</div>
+                <div id="infoHargaPreview" style="font-size:22px; font-weight:800; color:#0284c7; margin-bottom:8px;">Rp 1.750.000</div>
+                <div style="color:#475569; line-height:1.6;">
+                    <b>Daftar Tarif Program TK Tadika Puri:</b><br>
+                    • <b>Pre-Kinder:</b> Tatap Muka Rutin (Rp 1.500.000) | Daring Rutin (Rp 1.000.000)<br>
+                    • <b>Kinder A:</b> Tatap Muka Rutin (Rp 1.750.000) | Daring Rutin (Rp 1.200.000)<br>
+                    • <b>Kinder B:</b> Tatap Muka Rutin (Rp 2.000.000) | Daring Rutin (Rp 1.350.000)<br>
+                    • <b>Pilihan Kelas:</b> Reguler (+Rp 0) | Inklusi (+Rp 500.000 pendampingan khusus)
+                </div>
+            </div>
+
+            <!-- 3. DATA ORANG TUA -->
             <div class="section-group-title">👨‍👩‍👧 Data Orang Tua / Wali</div>
             <div class="grid-2">
                 <div class="input-box">
@@ -198,9 +244,9 @@
                 </div>
             </div>
 
-            <!-- 3. UPLOAD BERKAS -->
+            <!-- 4. UPLOAD BERKAS (KK, AKTA, & PAS FOTO SISWA) -->
             <div class="section-group-title">📂 Upload Berkas Dokumen</div>
-            <div class="grid-2">
+            <div class="grid-3">
                 <div class="input-box file-box">
                     <label>Upload Kartu Keluarga (KK) *</label>
                     <input type="file" name="kk" accept="image/*,.pdf" required>
@@ -209,12 +255,43 @@
                     <label>Upload Akta Kelahiran *</label>
                     <input type="file" name="akta" accept="image/*,.pdf" required>
                 </div>
+                <div class="input-box file-box">
+                    <label>Upload Pas Foto Siswa *</label>
+                    <input type="file" name="foto" accept="image/png, image/jpeg, image/jpg" required>
+                </div>
             </div>
 
             <button type="submit" class="btn-submit-formal">Simpan & Lanjutkan Pembayaran ➔</button>
         </form>
     </div>
 </div>
+
+<script>
+    function updateEstimasiBiaya() {
+        const jenjang = document.getElementById('jenjang').value;
+        const program = document.getElementById('tipe_program').value;
+        const kelas = document.getElementById('kelas').value;
+
+        const tarif = {
+            'Pre-Kinder|Tatap Muka Rutin': 1500000,
+            'Pre-Kinder|Daring Rutin': 1000000,
+            'Kinder A|Tatap Muka Rutin': 1750000,
+            'Kinder A|Daring Rutin': 1200000,
+            'Kinder B|Tatap Muka Rutin': 2000000,
+            'Kinder B|Daring Rutin': 1350000
+        };
+
+        let total = tarif[jenjang + '|' + program] || 1750000;
+        if (kelas === 'Inklusi') total += 500000;
+
+        document.getElementById('infoHargaPreview').innerText = 'Rp ' + total.toLocaleString('id-ID');
+    }
+
+    ['jenjang', 'tipe_program', 'kelas'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateEstimasiBiaya);
+    });
+    document.addEventListener('DOMContentLoaded', updateEstimasiBiaya);
+</script>
 
 </body>
 </html>

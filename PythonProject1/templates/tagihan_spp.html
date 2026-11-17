@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tagihan SPP Bulanan - TK Tadika Puri</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/logo-transparent.png') }}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f8fafc; color: #0f172a; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* Sidebar Biru Pendaftar */
+        .sidebar {
+            width: 270px;
+            background: linear-gradient(180deg, #0277bd 0%, #01579b 100%);
+            color: #ffffff;
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-nav a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.88);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .sidebar-nav a:hover { background: rgba(255, 255, 255, 0.14); color: #ffffff; }
+        .sidebar-nav a.active {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Kartu Info di Bagian Bawah Sidebar */
+        .sidebar-bottom-card {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 0.8rem;
+        }
+        .sidebar-bottom-card small { display: block; opacity: 0.8; margin-bottom: 2px; }
+        .sidebar-bottom-card strong { display: block; font-size: 0.92rem; margin-bottom: 10px; }
+        .sidebar-bottom-card p { font-size: 0.76rem; line-height: 1.5; opacity: 0.9; }
+
+        /* Konten Kanan */
+        .main-content { flex: 1; padding: 36px 40px; min-width: 0; }
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { color: #01579b; font-size: 1.75rem; font-weight: 700; }
+        .page-header p { color: #64748b; font-size: 0.92rem; margin-top: 4px; }
+
+        .card-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        }
+        .spp-header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; padding-bottom: 18px; margin-bottom: 20px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+        .spp-badge-harga {
+            background: #e0f2fe; color: #0369a1; padding: 10px 18px;
+            border-radius: 14px; font-weight: 800; font-size: 1.05rem;
+        }
+        .form-spp {
+            background: #f8fafc; padding: 20px; border-radius: 16px;
+            border: 1px solid #e2e8f0; margin-bottom: 24px;
+        }
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;
+        }
+        .form-grid label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        .form-grid select, .form-grid input {
+            width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff;
+        }
+        .btn-kirim {
+            margin-top: 16px; background: #0284c7; color: #fff; border: none;
+            padding: 11px 24px; border-radius: 12px; font-weight: 600; cursor: pointer;
+        }
+        .btn-kirim:hover { background: #0369a1; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 10px; }
+        th { background: #f1f5f9; color: #334155; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        .badge { padding: 4px 12px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
+        .badge-lunas { background: #dcfce7; color: #15803d; }
+        .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-tolak { background: #fee2e2; color: #b91c1c; }
+
+        @media (max-width: 768px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .sidebar-bottom-card { display: none; }
+            .main-content { padding: 22px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">TK Tadika Puri</div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard">📊 Dashboard Status</a>
+            <a href="/status_pembayaran">💳 Status Pembayaran</a>
+            <a href="/tagihan_spp" class="active">🧾 Tagihan SPP Bulanan</a>
+            <a href="/">🏠 Halaman Utama</a>
+            <a href="/logout">🚪 Logout</a>
+        </nav>
+
+        <div class="sidebar-bottom-card">
+            <small>Akun Wali Murid</small>
+            <strong>{{ nama }}</strong>
+            <p>Jam Layanan Admin:<br>Senin – Jumat, 08.00 – 15.00 WIB<br>WA: 0812-3456-7890</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Tagihan & Pembayaran SPP Bulanan</h1>
+            <p>Kelola pembayaran iuran bulanan siswa secara daring dengan mudah</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div style="background:#dcfce7; color:#15803d; padding:12px 16px; border-radius:12px; margin-bottom:18px; font-weight:600; font-size:0.88rem;">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="card-box">
+            <div class="spp-header">
+                <div>
+                    <h3 style="color:#0f172a; font-size:1.1rem;">Rincian Tarif SPP Siswa</h3>
+                    <small style="color:#64748b;">
+                        Jenjang {{ siswa['jenjang'] if (siswa and siswa['jenjang']) else 'Kinder A' }}
+                        ({{ siswa['tipe_program'] if (siswa and siswa['tipe_program']) else 'Tatap Muka Rutin' }})
+                        — Kelas {{ siswa['kelas'] if (siswa and siswa['kelas']) else 'Reguler' }}
+                    </small>
+                </div>
+                <div class="spp-badge-harga">
+                    Rp {{ "{:,.0f}".format(rincian_spp['total']).replace(',', '.') }} / bulan
+                </div>
+            </div>
+
+            {% if status == 'Lunas' %}
+                <form action="{{ url_for('bayar_spp') }}" method="POST" enctype="multipart/form-data" class="form-spp">
+                    <div style="font-weight:700; color:#0f172a; margin-bottom:12px; font-size:0.95rem;">Konfirmasi Transfer SPP Bulanan</div>
+                    <div class="form-grid">
+                        <div>
+                            <label>Bulan Tagihan *</label>
+                            <select name="bulan" required>
+                                <option value="Juli 2026">Juli 2026</option>
+                                <option value="Agustus 2026">Agustus 2026</option>
+                                <option value="September 2026">September 2026</option>
+                                <option value="Oktober 2026">Oktober 2026</option>
+                                <option value="November 2026">November 2026</option>
+                                <option value="Desember 2026">Desember 2026</option>
+                                <option value="Januari 2027">Januari 2027</option>
+                                <option value="Februari 2027">Februari 2027</option>
+                                <option value="Maret 2027">Maret 2027</option>
+                                <option value="April 2027">April 2027</option>
+                                <option value="Mei 2027">Mei 2027</option>
+                                <option value="Juni 2027">Juni 2027</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Rekening Tujuan *</label>
+                            <select name="metode_pembayaran" required>
+                                <option value="Bank BCA">Bank BCA - 1234567890 (a.n TK Tadika Puri)</option>
+                                <option value="Bank Mandiri">Bank Mandiri - 0987654321123 (a.n TK Tadika Puri)</option>
+                                <option value="Bank BRI">Bank BRI - 567801009988531 (a.n TK Tadika Puri)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Unggah Bukti Transfer *</label>
+                            <input type="file" name="bukti_spp" accept="image/*" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-kirim">Kirim Bukti Pembayaran SPP</button>
+                </form>
+
+                <h4 style="color:#0f172a; margin-bottom:8px;">Riwayat Pembayaran SPP</h4>
+                {% if riwayat_spp %}
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bulan</th>
+                                    <th>Nominal</th>
+                                    <th>Bank</th>
+                                    <th>Tanggal Kirim</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in riwayat_spp %}
+                                <tr>
+                                    <td><strong>{{ s['bulan'] }}</strong></td>
+                                    <td>Rp {{ "{:,.0f}".format(s['nominal']).replace(',', '.') }}</td>
+                                    <td>{{ s['metode_pembayaran'] }}</td>
+                                    <td style="color:#64748b;">{{ s['tanggal_upload'] }}</td>
+                                    <td>
+                                        {% if s['status'] == 'Lunas' %}
+                                            <span class="badge badge-lunas">Lunas</span>
+                                        {% elif s['status'] == 'Ditolak' %}
+                                            <span class="badge badge-tolak">Ditolak</span>
+                                        {% else %}
+                                            <span class="badge badge-pending">Menunggu Verifikasi</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p style="color:#64748b; font-size:0.88rem;">Belum ada riwayat pembayaran SPP bulanan.</p>
+                {% endif %}
+            {% else %}
+                <div style="background:#fffbeb; border:1px solid #fde68a; color:#92400e; padding:14px 18px; border-radius:12px; font-size:0.9rem;">
+                    ℹ️ Fitur pembayaran SPP bulanan akan otomatis aktif setelah <b>Pembayaran Pendaftaran PPDB</b> Anda diverifikasi (<b>Lunas</b>) oleh Admin.
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -3,156 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Data Siswa - Admin TK Tadika Puri</title>
+    <title>Detail Calon Siswa - Admin TK Tadika Puri</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='image/logo-transparent.png') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body {
             min-height: 100vh;
-            background:
-                radial-gradient(circle at 15% 18%, #638da5 0%, transparent 45%),
-                radial-gradient(circle at 85% 22%, #c3dfee 0%, transparent 52%),
-                linear-gradient(135deg, #5c859d 0%, #99c1d6 48%, #d7e9f3 100%);
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #5c859d 0%, #99c1d6 48%, #d7e9f3 100%);
+            padding: 32px 18px;
             color: #0f172a;
-            padding: 32px 20px;
         }
-        .container {
-            max-width: 900px; margin: 0 auto;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.45) 100%);
-            backdrop-filter: blur(24px) saturate(145%);
-            -webkit-backdrop-filter: blur(24px) saturate(145%);
-            padding: 30px; border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 12px 36px rgba(18, 48, 72, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
-            animation: glassEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-        @keyframes glassEnter {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: translateY(0); }
+        .container { max-width: 860px; margin: 0 auto; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid #ffffff;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 12px 32px rgba(15, 38, 56, 0.12);
         }
         .header {
-            display: flex; justify-content: space-between; align-items: center; gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.65); padding-bottom: 18px; margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; padding-bottom: 18px; margin-bottom: 22px;
+            border-bottom: 1px solid #cbd5e1;
         }
-        .header h1 { color: #0f172a; font-size: 1.4rem; font-weight: 700; }
+        .header h2 { font-size: 1.35rem; color: #0369a1; }
         .btn-back {
-            padding: 9px 16px; background: rgba(255, 255, 255, 0.8); color: #0f172a; text-decoration: none;
-            border-radius: 12px; font-weight: 600; font-size: 0.84rem; border: 1px solid #ffffff;
-            white-space: nowrap; transition: 0.2s;
+            text-decoration: none; background: #e0f2fe; color: #0369a1;
+            padding: 8px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;
         }
-        .btn-back:hover { background: #ffffff; transform: translateY(-2px); }
-
-        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-        .info-group label { display: block; font-size: 0.78rem; color: #475569; font-weight: 600; margin-bottom: 5px; }
-        .info-group p {
-            font-size: 0.92rem; font-weight: 600; color: #0f172a;
-            background: rgba(255, 255, 255, 0.58); padding: 11px 14px;
-            border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.85);
+        .section-title {
+            font-size: 0.95rem; font-weight: 700; color: #0284c7;
+            margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 1px dashed #bae6fd;
         }
-
-        .berkas-section { margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.65); padding-top: 20px; }
-        .berkas-section h3 { color: #0f172a; font-size: 1.05rem; margin-bottom: 14px; }
-        .berkas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-        .berkas-card {
-            border: 1px solid rgba(255, 255, 255, 0.8); padding: 18px 14px; border-radius: 16px;
-            text-align: center; background: rgba(255, 255, 255, 0.52);
+        .detail-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px; font-size: 0.88rem;
         }
-        .berkas-card a {
-            display: inline-block; margin-top: 10px; padding: 7px 14px; border-radius: 10px;
-            background: #0284c7; color: #ffffff; font-weight: 600; text-decoration: none; font-size: 0.82rem;
+        .detail-box {
+            background: #f8fafc; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0;
         }
-
-        @media (max-width: 768px) {
-            body { padding: 16px; }
-            .container { padding: 20px 16px; border-radius: 20px; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .header h1 { font-size: 1.2rem; }
-            .btn-back { width: 100%; text-align: center; }
-            .grid-info { grid-template-columns: 1fr; gap: 12px; }
-            .grid-info .info-group { grid-column: span 1 !important; }
-            .berkas-grid { grid-template-columns: 1fr; }
+        .detail-box small { display: block; color: #64748b; font-size: 0.75rem; margin-bottom: 2px; }
+        .detail-box strong { color: #0f172a; }
+        .doc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .btn-doc {
+            text-decoration: none; padding: 9px 15px; border-radius: 10px;
+            font-size: 0.82rem; font-weight: 600; background: #0284c7; color: #ffffff;
+        }
+        .btn-doc.disabled { background: #cbd5e1; color: #64748b; pointer-events: none; }
+        .footer-actions {
+            margin-top: 26px; padding-top: 18px; border-top: 1px solid #cbd5e1;
+            display: flex; flex-wrap: wrap; gap: 10px;
+        }
+        .btn-pdf {
+            text-decoration: none; background: #16a34a; color: #fff;
+            padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;
+        }
+        .btn-edit {
+            text-decoration: none; background: #f59e0b; color: #fff;
+            padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;
         }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <div class="header">
-        <h1>Detail Formulir & Berkas Siswa</h1>
-        <a href="/data_siswa" class="btn-back">← Kembali ke Data Siswa</a>
-    </div>
+    <div class="glass-card">
+        <div class="header">
+            <h2>Detail Biodata Calon Siswa</h2>
+            <a href="/data_siswa" class="btn-back">← Kembali ke Data Siswa</a>
+        </div>
 
-    <div class="grid-info">
-        <div class="info-group">
-            <label>Nama Lengkap Siswa</label>
-            <p>{{ siswa.nama_siswa or '-' }}</p>
+        <div class="section-title">1. Pilihan Program & Kelas</div>
+        <div class="detail-grid">
+            <div class="detail-box">
+                <small>Jenjang Pendidikan</small>
+                <strong>{{ siswa['jenjang'] or 'Kinder A' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Tipe Program</small>
+                <strong>{{ siswa['tipe_program'] or 'Tatap Muka Rutin' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Pilihan Kelas</small>
+                <strong>Kelas {{ siswa['kelas'] or 'Reguler' }}</strong>
+            </div>
         </div>
-        <div class="info-group">
-            <label>Nama Panggilan</label>
-            <p>{{ siswa.nama_panggilan or '-' }}</p>
-        </div>
-        <div class="info-group">
-            <label>Tempat, Tanggal Lahir</label>
-            <p>{{ siswa.tempat_lahir or 'Depok' }}, {{ siswa.tanggal_lahir or '-' }}</p>
-        </div>
-        <div class="info-group">
-            <label>Jenis Kelamin</label>
-            <p>{{ siswa.jenis_kelamin or '-' }}</p>
-        </div>
-        <div class="info-group">
-            <label>Agama</label>
-            <p>{{ siswa.agama or '-' }}</p>
-        </div>
-        <div class="info-group">
-            <label>Tinggi & Berat Badan</label>
-            <p>{{ siswa.tinggi_badan or '-' }} cm / {{ siswa.berat_badan or '-' }} kg</p>
-        </div>
-        <div class="info-group" style="grid-column: span 2;">
-            <label>Alamat Lengkap Domisili</label>
-            <p>{{ siswa.alamat or '-' }}</p>
-        </div>
-        <div class="info-group">
-            <label>Data Ayah</label>
-            <p>{{ siswa.nama_ayah or '-' }} ({{ siswa.pekerjaan_ayah or '-' }})</p>
-        </div>
-        <div class="info-group">
-            <label>Data Ibu</label>
-            <p>{{ siswa.nama_ibu or '-' }} ({{ siswa.pekerjaan_ibu or '-' }})</p>
-        </div>
-    </div>
 
-    <div class="berkas-section">
-        <h3>Lampiran Dokumen Pendaftar</h3>
-        <div class="berkas-grid">
-            <div class="berkas-card">
-                <strong>Kartu Keluarga (KK)</strong><br>
-                @if siswa.file_kk %}
-                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.file_kk) }}" target="_blank">🔍 Buka Berkas KK</a>
-                {% else %}
-                    <div style="margin-top: 8px; color: #64748b; font-size: 0.82rem;">Tidak diunggah</div>
-                {% endif %}
+        <div class="section-title">2. Identitas Calon Siswa</div>
+        <div class="detail-grid">
+            <div class="detail-box">
+                <small>Nama Lengkap</small>
+                <strong>{{ siswa['nama_siswa'] or '-' }}</strong>
             </div>
-            <div class="berkas-card">
-                <strong>Akta Kelahiran</strong><br>
-                {% if siswa.file_akta %}
-                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.file_akta) }}" target="_blank">🔍 Buka Akta</a>
-                {% else %}
-                    <div style="margin-top: 8px; color: #64748b; font-size: 0.82rem;">Tidak diunggah</div>
-                {% endif %}
+            <div class="detail-box">
+                <small>Nama Panggilan</small>
+                <strong>{{ siswa['nama_panggilan'] or '-' }}</strong>
             </div>
-            <div class="berkas-card">
-                <strong>Foto Siswa</strong><br>
-                {% if siswa.foto %}
-                    <a href="{{ url_for('static', filename='uploads/' ~ siswa.foto) }}" target="_blank">🔍 Buka Foto</a>
-                {% else %}
-                    <div style="margin-top: 8px; color: #64748b; font-size: 0.82rem;">Tidak diunggah</div>
-                {% endif %}
+            <div class="detail-box">
+                <small>Tempat, Tanggal Lahir</small>
+                <strong>{{ siswa['tempat_lahir'] or 'Depok' }}, {{ siswa['tanggal_lahir'] or '-' }}</strong>
             </div>
+            <div class="detail-box">
+                <small>Jenis Kelamin</small>
+                <strong>{{ siswa['jenis_kelamin'] or '-' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Agama</small>
+                <strong>{{ siswa['agama'] or '-' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Tinggi / Berat Badan</small>
+                <strong>{{ siswa['tinggi_badan'] or '-' }} cm / {{ siswa['berat_badan'] or '-' }} kg</strong>
+            </div>
+            <div class="detail-box" style="grid-column: 1 / -1;">
+                <small>Alamat Domisili</small>
+                <strong>{{ siswa['alamat'] or '-' }}</strong>
+            </div>
+        </div>
+
+        <div class="section-title">3. Data Orang Tua / Wali</div>
+        <div class="detail-grid">
+            <div class="detail-box">
+                <small>Nama Ayah</small>
+                <strong>{{ siswa['nama_ayah'] or '-' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Pekerjaan Ayah</small>
+                <strong>{{ siswa['pekerjaan_ayah'] or '-' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Nama Ibu</small>
+                <strong>{{ siswa['nama_ibu'] or '-' }}</strong>
+            </div>
+            <div class="detail-box">
+                <small>Pekerjaan Ibu</small>
+                <strong>{{ siswa['pekerjaan_ibu'] or '-' }}</strong>
+            </div>
+        </div>
+
+        <div class="section-title">4. Berkas Lampiran Pendaftar</div>
+        <div class="doc-actions">
+            {% if siswa['file_kk'] %}
+                <a href="{{ url_for('static', filename='uploads/' + siswa['file_kk']) }}" target="_blank" class="btn-doc">📄 Lihat Kartu Keluarga (KK)</a>
+            {% else %}
+                <span class="btn-doc disabled">KK Belum Diunggah</span>
+            {% endif %}
+
+            {% if siswa['file_akta'] %}
+                <a href="{{ url_for('static', filename='uploads/' + siswa['file_akta']) }}" target="_blank" class="btn-doc">📄 Lihat Akta Kelahiran</a>
+            {% else %}
+                <span class="btn-doc disabled">Akta Belum Diunggah</span>
+            {% endif %}
+
+            {% if siswa['foto'] %}
+                <a href="{{ url_for('static', filename='uploads/' + siswa['foto']) }}" target="_blank" class="btn-doc">🖼️ Lihat Pas Foto</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-actions">
+            <a href="/cetak_bukti/{{ siswa['id'] }}" target="_blank" class="btn-pdf">🖨️ Cetak Surat Penerimaan (PDF)</a>
+            <a href="/edit_siswa/{{ siswa['id'] }}" class="btn-edit">✏️ Edit Data Siswa</a>
         </div>
     </div>
 </div>
-
 </body>
 </html>

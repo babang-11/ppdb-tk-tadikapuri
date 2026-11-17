@@ -319,7 +319,7 @@
 
         /* Quick Actions */
         .section-label { font-size: 0.98rem; font-weight: 700; color: #ffffff; margin-bottom: 12px; text-shadow: 0 1px 6px rgba(15, 45, 70, 0.15); }
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
         .action-item {
             display: flex; align-items: center; justify-content: space-between; gap: 12px;
             padding: 18px 20px; border-radius: 20px; text-decoration: none; color: #0f172a;
@@ -431,6 +431,12 @@
                 <a href="/data_pembayaran">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     Data Pembayaran
+                </a>
+            </li>
+            <li>
+                <a href="/data_spp">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Data SPP Bulanan
                 </a>
             </li>
             <li>
@@ -581,11 +587,11 @@
 
             <div class="glass-card anim-item delay-6">
                 <div class="stat-top">
-                    <span class="stat-title">Status Gelombang</span>
-                    <div class="stat-icon-box">🏫</div>
+                    <span class="stat-title">Antrean SPP Bulanan</span>
+                    <div class="stat-icon-box">💳</div>
                 </div>
-                <div class="stat-val" style="font-size: 1.4rem; padding-top: 6px;">Dibuka</div>
-                <span class="stat-trend trend-up">↗ PPDB Online</span>
+                <div class="stat-val count-num" data-target="{{ pending_spp or 0 }}">0</div>
+                <span class="stat-trend trend-warn">● Cek Bukti SPP</span>
             </div>
         </section>
 
@@ -593,8 +599,16 @@
         <section class="action-grid anim-item delay-7">
             <a href="/data_pembayaran" class="action-item">
                 <div>
-                    <h4>Verifikasi Pembayaran ({{ menunggu }})</h4>
-                    <p>Cek bukti transfer & setujui pembayaran</p>
+                    <h4>Verifikasi PPDB ({{ menunggu }})</h4>
+                    <p>Cek bukti transfer pendaftaran awal</p>
+                </div>
+                <div class="action-arrow">↗</div>
+            </a>
+
+            <a href="/data_spp" class="action-item">
+                <div>
+                    <h4>Verifikasi SPP ({{ pending_spp or 0 }})</h4>
+                    <p>Cek bukti pembayaran SPP bulanan</p>
                 </div>
                 <div class="action-arrow">↗</div>
             </a>
@@ -673,7 +687,6 @@
         }
     });
 
-    // Jalankan Animasi Progress Bar, Donut & Count-Up Angka Seperti di Video
     window.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () {
             document.querySelectorAll('.prog-fill[data-width]').forEach(function (el) {

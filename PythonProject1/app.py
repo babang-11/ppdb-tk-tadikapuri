@@ -27,6 +27,42 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+def hitung_biaya_ppdb(jenjang, tipe_program, kelas):
+    tarif_dasar = {
+        ('Pre-Kinder', 'Tatap Muka Rutin'): 1500000,
+        ('Pre-Kinder', 'Daring Rutin'): 1000000,
+        ('Kinder A', 'Tatap Muka Rutin'): 1750000,
+        ('Kinder A', 'Daring Rutin'): 1200000,
+        ('Kinder B', 'Tatap Muka Rutin'): 2000000,
+        ('Kinder B', 'Daring Rutin'): 1350000,
+    }
+    biaya_program = tarif_dasar.get((jenjang, tipe_program), 1750000)
+    biaya_kelas = 500000 if kelas == 'Inklusi' else 0
+    total = biaya_program + biaya_kelas
+    return {
+        'biaya_program': biaya_program,
+        'biaya_kelas': biaya_kelas,
+        'total': total
+    }
+
+def hitung_spp_bulanan(jenjang, tipe_program, kelas):
+    tarif_spp = {
+        ('Pre-Kinder', 'Tatap Muka Rutin'): 350000,
+        ('Pre-Kinder', 'Daring Rutin'): 250000,
+        ('Kinder A', 'Tatap Muka Rutin'): 400000,
+        ('Kinder A', 'Daring Rutin'): 300000,
+        ('Kinder B', 'Tatap Muka Rutin'): 450000,
+        ('Kinder B', 'Daring Rutin'): 325000,
+    }
+    spp_dasar = tarif_spp.get((jenjang, tipe_program), 400000)
+    tambahan_inklusi = 150000 if kelas == 'Inklusi' else 0
+    total = spp_dasar + tambahan_inklusi
+    return {
+        'spp_dasar': spp_dasar,
+        'tambahan_inklusi': tambahan_inklusi,
+        'total': total
+    }
+
 def init_db():
     conn = get_db()
     cur = conn.cursor()
@@ -48,6 +84,7 @@ def init_db():
     cur.execute("""
         CREATE TABLE IF NOT EXISTS siswa (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
             nama_siswa TEXT,
             nama_panggilan TEXT,
             tempat_lahir TEXT,
@@ -61,6 +98,9 @@ def init_db():
             pekerjaan_ayah TEXT,
             nama_ibu TEXT,
             pekerjaan_ibu TEXT,
+            jenjang TEXT DEFAULT 'Kinder A',
+            tipe_program TEXT DEFAULT 'Tatap Muka Rutin',
+            kelas TEXT DEFAULT 'Reguler',
             file_kk TEXT,
             file_akta TEXT,
             foto TEXT,
@@ -68,13 +108,47 @@ def init_db():
         )
     """)
 
-    # Tabel Pembayaran
+    # Migrasi kolom otomatis untuk database ppdb.db yang sudah ada
+    kolom_siswa = [row[1] for row in cur.execute("PRAGMA table_info(siswa)").fetchall()]
+    if 'email' not in kolom_siswa:
+        cur.execute("ALTER TABLE siswa ADD COLUMN email TEXT")
+    if 'jenjang' not in kolom_siswa:
+        cur.execute("ALTER TABLE siswa ADD COLUMN jenjang TEXT DEFAULT 'Kinder A'")
+    if 'tipe_program' not in kolom_siswa:
+        cur.execute("ALTER TABLE siswa ADD COLUMN tipe_program TEXT DEFAULT 'Tatap Muka Rutin'")
+    if 'kelas' not in kolom_siswa:
+        cur.execute("ALTER TABLE siswa ADD COLUMN kelas TEXT DEFAULT 'Reguler'")
+
+    # Tabel Pembayaran PPDB
     cur.execute("""
         CREATE TABLE IF NOT EXISTS pembayaran (
             id_pembayaran INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT,
+            metode_pembayaran TEXT DEFAULT 'Bank BCA',
+            nominal INTEGER DEFAULT 0,
             bukti TEXT,
             status TEXT DEFAULT 'Menunggu Verifikasi'
+        )
+    """)
+
+    kolom_bayar = [row[1] for row in cur.execute("PRAGMA table_info(pembayaran)").fetchall()]
+    if 'metode_pembayaran' not in kolom_bayar:
+        cur.execute("ALTER TABLE pembayaran ADD COLUMN metode_pembayaran TEXT DEFAULT 'Bank BCA'")
+    if 'nominal' not in kolom_bayar:
+        cur.execute("ALTER TABLE pembayaran ADD COLUMN nominal INTEGER DEFAULT 0")
+
+    # Tabel Pembayaran SPP Bulanan
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS pembayaran_spp (
+            id_spp INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            nama_siswa TEXT,
+            bulan TEXT,
+            nominal INTEGER DEFAULT 0,
+            metode_pembayaran TEXT DEFAULT 'Bank BCA',
+            bukti TEXT,
+            status TEXT DEFAULT 'Menunggu Verifikasi',
+            tanggal_upload TEXT
         )
     """)
 
@@ -126,7 +200,6 @@ def login():
         user = cur.fetchone()
         conn.close()
 
-        # Mendukung pengecekan password plain text maupun password hasil reset (hash)
         is_valid = False
         if user:
             if user[2] == password or check_password_hash(user[2], password):
@@ -160,6 +233,50 @@ def dashboard():
 
     conn = get_db()
     cur = conn.cursor()
+
+    cur.execute("""
+        SELECT status, metode_pembayaran, nominal
+        FROM pembayaran
+        WHERE email=?
+        ORDER BY id_pembayaran DESC
+        LIMIT 1
+    """, (session['email'],))
+    data_bayar = cur.fetchone()
+
+    cur.execute("SELECT * FROM siswa WHERE email=? ORDER BY id DESC LIMIT 1", (session['email'],))
+    siswa = cur.fetchone()
+    conn.close()
+
+    status = data_bayar['status'] if data_bayar else "Belum Bayar"
+
+    rincian = None
+    if siswa:
+        jenjang = siswa['jenjang'] or 'Kinder A'
+        tipe_program = siswa['tipe_program'] or 'Tatap Muka Rutin'
+        kelas = siswa['kelas'] or 'Reguler'
+        rincian = hitung_biaya_ppdb(jenjang, tipe_program, kelas)
+
+    return render_template(
+        'dashboard.html',
+        nama=session['nama'],
+        status=status,
+        siswa=siswa,
+        rincian=rincian,
+        pembayaran=data_bayar
+    )
+
+# ================= HALAMAN TAGIHAN SPP BULANAN (USER) =================
+@app.route('/tagihan_spp')
+def tagihan_spp():
+    if 'login' not in session:
+        return redirect('/login')
+
+    if session.get('role') == 'admin':
+        return redirect('/admin_dashboard')
+
+    conn = get_db()
+    cur = conn.cursor()
+
     cur.execute("""
         SELECT status
         FROM pembayaran
@@ -167,13 +284,77 @@ def dashboard():
         ORDER BY id_pembayaran DESC
         LIMIT 1
     """, (session['email'],))
+    data_bayar = cur.fetchone()
 
-    data = cur.fetchone()
+    cur.execute("SELECT * FROM siswa WHERE email=? ORDER BY id DESC LIMIT 1", (session['email'],))
+    siswa = cur.fetchone()
+    if not siswa:
+        cur.execute("SELECT * FROM siswa WHERE nama_siswa LIKE ? ORDER BY id DESC LIMIT 1", ('%' + session['nama'] + '%',))
+        siswa = cur.fetchone()
+    if not siswa:
+        cur.execute("SELECT * FROM siswa ORDER BY id DESC LIMIT 1")
+        siswa = cur.fetchone()
+
+    cur.execute("SELECT * FROM pembayaran_spp WHERE email=? ORDER BY id_spp DESC", (session['email'],))
+    riwayat_spp = cur.fetchall()
     conn.close()
 
-    status = data[0] if data else "Belum Bayar"
+    status = data_bayar['status'] if data_bayar else "Belum Bayar"
 
-    return render_template('dashboard.html', nama=session['nama'], status=status)
+    jenjang = siswa['jenjang'] if (siswa and siswa['jenjang']) else 'Kinder A'
+    tipe_program = siswa['tipe_program'] if (siswa and siswa['tipe_program']) else 'Tatap Muka Rutin'
+    kelas = siswa['kelas'] if (siswa and siswa['kelas']) else 'Reguler'
+    rincian_spp = hitung_spp_bulanan(jenjang, tipe_program, kelas)
+
+    return render_template(
+        'tagihan_spp.html',
+        nama=session['nama'],
+        status=status,
+        siswa=siswa,
+        rincian_spp=rincian_spp,
+        riwayat_spp=riwayat_spp
+    )
+
+# ================= UPLOAD PEMBAYARAN SPP BULANAN (USER) =================
+@app.route('/bayar_spp', methods=['POST'])
+def bayar_spp():
+    if 'login' not in session:
+        return redirect('/login')
+
+    bulan = request.form.get('bulan')
+    metode_pembayaran = request.form.get('metode_pembayaran', 'Bank BCA')
+    file = request.files.get('bukti_spp')
+
+    if not file or file.filename == '':
+        flash("Harap unggah file bukti transfer SPP terlebih dahulu!")
+        return redirect('/tagihan_spp')
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM siswa WHERE email=? ORDER BY id DESC LIMIT 1", (session['email'],))
+    siswa = cur.fetchone()
+
+    nama_siswa = siswa['nama_siswa'] if siswa else session['nama']
+    jenjang = siswa['jenjang'] if (siswa and siswa['jenjang']) else 'Kinder A'
+    tipe_program = siswa['tipe_program'] if (siswa and siswa['tipe_program']) else 'Tatap Muka Rutin'
+    kelas = siswa['kelas'] if (siswa and siswa['kelas']) else 'Reguler'
+    rincian_spp = hitung_spp_bulanan(jenjang, tipe_program, kelas)
+
+    folder = os.path.join(BASE_DIR, 'static/bukti')
+    os.makedirs(folder, exist_ok=True)
+    filename = "SPP_" + str(int(time.time())) + "_" + secure_filename(file.filename)
+    file.save(os.path.join(folder, filename))
+
+    tanggal_sekarang = time.strftime('%d-%m-%Y %H:%M')
+    cur.execute("""
+        INSERT INTO pembayaran_spp (email, nama_siswa, bulan, nominal, metode_pembayaran, bukti, status, tanggal_upload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (session['email'], nama_siswa, bulan, rincian_spp['total'], metode_pembayaran, filename, 'Menunggu Verifikasi', tanggal_sekarang))
+    conn.commit()
+    conn.close()
+
+    flash(f"Bukti pembayaran SPP bulan {bulan} berhasil dikirim!")
+    return redirect('/tagihan_spp')
 
 # ================= REGISTER (LANGKAH 1) =================
 @app.route('/register', methods=['GET', 'POST'])
@@ -186,7 +367,7 @@ def register():
 
         conn = get_db()
         cur = conn.cursor()
-        
+
         cur.execute("SELECT id FROM users WHERE email=?", (email,))
         if cur.fetchone():
             conn.close()
@@ -230,6 +411,11 @@ def pendaftaran():
         nama_ibu = request.form['nama_ibu']
         pekerjaan_ibu = request.form['pekerjaan_ibu']
 
+        # Tangkap pilihan program dari formulir
+        jenjang = request.form.get('jenjang', 'Kinder A')
+        tipe_program = request.form.get('tipe_program', 'Tatap Muka Rutin')
+        kelas = request.form.get('kelas', 'Reguler')
+
         def save_file(file):
             if file and file.filename != '':
                 filename = str(int(time.time())) + "_" + secure_filename(file.filename)
@@ -248,16 +434,18 @@ def pendaftaran():
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO siswa (
-                nama_siswa, nama_panggilan, tempat_lahir, tanggal_lahir,
+                email, nama_siswa, nama_panggilan, tempat_lahir, tanggal_lahir,
                 jenis_kelamin, agama, alamat, tinggi_badan, berat_badan,
                 nama_ayah, pekerjaan_ayah, nama_ibu, pekerjaan_ibu,
+                jenjang, tipe_program, kelas,
                 file_kk, file_akta, foto, status
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            nama, nama_panggilan, 'Depok', tgl_lahir,
+            session['email'], nama, nama_panggilan, 'Depok', tgl_lahir,
             jenis_kelamin, agama, alamat, tinggi_badan, berat_badan,
             nama_ayah, pekerjaan_ayah, nama_ibu, pekerjaan_ibu,
+            jenjang, tipe_program, kelas,
             kk, akta, foto, 'Belum Verifikasi'
         ))
 
@@ -274,8 +462,24 @@ def pembayaran():
     if 'login' not in session:
         return redirect('/login')
 
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM siswa WHERE email=? ORDER BY id DESC LIMIT 1", (session['email'],))
+    siswa = cur.fetchone()
+
+    if not siswa:
+        cur.execute("SELECT * FROM siswa ORDER BY id DESC LIMIT 1")
+        siswa = cur.fetchone()
+
+    jenjang = siswa['jenjang'] if siswa and siswa['jenjang'] else 'Kinder A'
+    tipe_program = siswa['tipe_program'] if siswa and siswa['tipe_program'] else 'Tatap Muka Rutin'
+    kelas = siswa['kelas'] if siswa and siswa['kelas'] else 'Reguler'
+    rincian = hitung_biaya_ppdb(jenjang, tipe_program, kelas)
+
     if request.method == 'POST':
         file = request.files['bukti']
+        metode_pembayaran = request.form.get('metode_pembayaran', 'Bank BCA')
 
         folder = os.path.join(BASE_DIR, 'static/bukti')
         if not os.path.exists(folder):
@@ -284,18 +488,17 @@ def pembayaran():
         filename = str(int(time.time())) + "_" + secure_filename(file.filename)
         file.save(os.path.join(folder, filename))
 
-        conn = get_db()
-        cur = conn.cursor()
         cur.execute("""
-            INSERT INTO pembayaran (email, bukti, status)
-            VALUES (?, ?, ?)
-        """, (session['email'], filename, 'Menunggu Verifikasi'))
+            INSERT INTO pembayaran (email, metode_pembayaran, nominal, bukti, status)
+            VALUES (?, ?, ?, ?, ?)
+        """, (session['email'], metode_pembayaran, rincian['total'], filename, 'Menunggu Verifikasi'))
         conn.commit()
         conn.close()
 
         return render_template('terima_kasih.html')
 
-    return render_template('bukti_pembayaran.html')
+    conn.close()
+    return render_template('bukti_pembayaran.html', siswa=siswa, rincian=rincian)
 
 # ================= STATUS PEMBAYARAN USER =================
 @app.route('/status_pembayaran')
@@ -305,23 +508,27 @@ def status_pembayaran():
 
     conn = get_db()
     cur = conn.cursor()
-    
+
     cur.execute("""
-        SELECT status 
-        FROM pembayaran 
-        WHERE email=? 
-        ORDER BY id_pembayaran DESC 
+        SELECT status
+        FROM pembayaran
+        WHERE email=?
+        ORDER BY id_pembayaran DESC
         LIMIT 1
     """, (session['email'],))
     data_bayar = cur.fetchone()
 
-    cur.execute("SELECT id FROM siswa WHERE nama_siswa LIKE ? ORDER BY id DESC LIMIT 1", ('%' + session['nama'] + '%',))
+    cur.execute("SELECT id FROM siswa WHERE email=? ORDER BY id DESC LIMIT 1", (session['email'],))
     data_siswa = cur.fetchone()
-    
+
+    if not data_siswa:
+        cur.execute("SELECT id FROM siswa WHERE nama_siswa LIKE ? ORDER BY id DESC LIMIT 1", ('%' + session['nama'] + '%',))
+        data_siswa = cur.fetchone()
+
     if not data_siswa:
         cur.execute("SELECT id FROM siswa ORDER BY id DESC LIMIT 1")
         data_siswa = cur.fetchone()
-        
+
     conn.close()
 
     status = data_bayar[0] if data_bayar else "Belum Bayar"
@@ -388,9 +595,25 @@ def admin_dashboard():
 
     cur.execute("SELECT COUNT(*) FROM pembayaran WHERE status='Menunggu Verifikasi'")
     pending = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM pembayaran_spp WHERE status='Menunggu Verifikasi'")
+    pending_spp = cur.fetchone()[0]
+
+    cur.execute("SELECT COALESCE(SUM(nominal), 0) FROM pembayaran WHERE status='Lunas'")
+    total_ppdb = cur.fetchone()[0]
+
+    cur.execute("SELECT COALESCE(SUM(nominal), 0) FROM pembayaran_spp WHERE status='Lunas'")
+    total_spp = cur.fetchone()[0]
     conn.close()
 
-    return render_template('admin_dashboard.html', total_user=total_user, pending=pending)
+    return render_template(
+        'admin_dashboard.html',
+        total_user=total_user,
+        pending=pending,
+        pending_spp=pending_spp,
+        total_ppdb=total_ppdb,
+        total_spp=total_spp
+    )
 
 # ================= DATA SISWA (ADMIN) =================
 @app.route('/data_siswa')
@@ -468,7 +691,7 @@ def hapus_siswa(id):
 
     return redirect('/data_siswa')
 
-# ================= DATA PEMBAYARAN (ADMIN) =================
+# ================= DATA PEMBAYARAN PPDB (ADMIN) =================
 @app.route('/data_pembayaran')
 def data_pembayaran():
     if session.get('role') != 'admin':
@@ -477,7 +700,7 @@ def data_pembayaran():
     conn = get_db()
     cur = conn.cursor()
     cur.execute("""
-        SELECT id_pembayaran, email, bukti, status
+        SELECT id_pembayaran, email, bukti, status, metode_pembayaran, nominal
         FROM pembayaran
         ORDER BY id_pembayaran DESC
     """)
@@ -486,7 +709,7 @@ def data_pembayaran():
 
     return render_template('data_pembayaran.html', pembayaran=data)
 
-# ================= VERIFIKASI PEMBAYARAN (ADMIN) =================
+# ================= VERIFIKASI PEMBAYARAN PPDB (ADMIN) =================
 @app.route('/verifikasi/<id>/<status>')
 def verifikasi(id, status):
     if session.get('role') != 'admin':
@@ -513,14 +736,41 @@ def acc(id):
     conn = get_db()
     cur = conn.cursor()
     cur.execute("""
-        UPDATE pembayaran 
-        SET status='Lunas' 
+        UPDATE pembayaran
+        SET status='Lunas'
         WHERE id_pembayaran=?
     """, (id,))
     conn.commit()
     conn.close()
 
     return redirect(url_for('data_pembayaran'))
+
+# ================= DATA & VERIFIKASI SPP BULANAN (ADMIN) =================
+@app.route('/data_spp')
+def data_spp():
+    if session.get('role') != 'admin':
+        return "Akses Ditolak!"
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM pembayaran_spp ORDER BY id_spp DESC")
+    data = cur.fetchall()
+    conn.close()
+
+    return render_template('data_spp.html', data_spp=data)
+
+@app.route('/verifikasi_spp/<int:id>/<status>')
+def verifikasi_spp(id, status):
+    if session.get('role') != 'admin':
+        return "Akses Ditolak!"
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("UPDATE pembayaran_spp SET status=? WHERE id_spp=?", (status, id))
+    conn.commit()
+    conn.close()
+
+    return redirect('/data_spp')
 
 # ================= MANAGEMENT USER (ADMIN) =================
 @app.route('/tambah', methods=['POST'])
@@ -568,9 +818,9 @@ def cetak_pdf():
     conn = get_db()
     cur = conn.cursor()
     cur.execute("""
-        SELECT s.nama_siswa, s.jenis_kelamin, s.alamat, p.status 
+        SELECT s.nama_siswa, s.jenis_kelamin, s.alamat, p.status
         FROM siswa s
-        LEFT JOIN pembayaran p ON s.nama_siswa = p.email OR p.status IN ('Lunas', 'Disetujui', 'Diterima')
+        LEFT JOIN pembayaran p ON s.email = p.email OR p.status IN ('Lunas', 'Disetujui', 'Diterima')
         GROUP BY s.id
     """)
     data_siswa = cur.fetchall()
@@ -583,7 +833,7 @@ def cetak_pdf():
 
     logo_path = os.path.join(BASE_DIR, "static/image/logo-transparent.png")
     logo = Image(logo_path, width=65, height=65) if os.path.exists(logo_path) else Paragraph("", styles['Normal'])
-    
+
     header_text = Paragraph(
         """
         <font size="14" color="#01579b"><b>PANITIA PENERIMAAN PESERTA DIDIK BARU (PPDB)</b></font><br/>
@@ -669,9 +919,9 @@ def cetak_bukti(id):
     conn = get_db()
     cur = conn.cursor()
     cur.execute("""
-        SELECT nama_siswa, nama_panggilan, tempat_lahir, tanggal_lahir, 
+        SELECT nama_siswa, nama_panggilan, tempat_lahir, tanggal_lahir,
                jenis_kelamin, agama, alamat, nama_ayah, nama_ibu
-        FROM siswa 
+        FROM siswa
         WHERE id=?
     """, (id,))
     siswa = cur.fetchone()
@@ -818,7 +1068,7 @@ def reset_password():
 
 # ================= LOGOUT =================
 @app.route('/logout')
-def logout():       
+def logout():
     session.clear()
     return redirect('/')
 
