@@ -18,8 +18,7 @@
         .header h1 { color: #0369a1; font-size: 28px; font-weight: 800; margin-bottom: 6px; }
         .header p { color: #64748b; font-size: 14px; }
 
-        /* Kartu Ringkasan Tagihan Sesuai Formulir */
-        .bill-card {
+                .bill-card {
             background: #ffffff;
             border-radius: 18px;
             padding: 24px 28px;
@@ -116,8 +115,7 @@
         }
         .btn-copy:hover { background: #bae6fd; }
 
-        /* Form Konfirmasi Pembayaran */
-        .confirm-card {
+                .confirm-card {
             background: #ffffff;
             border-radius: 18px;
             padding: 26px 28px;
@@ -164,8 +162,7 @@
         <p>Silakan transfer biaya pendaftaran sesuai program pilihan Anda ke salah satu rekening bank resmi di bawah ini:</p>
     </div>
 
-    <!-- RINGKASAN PROGRAM & NOMINAL SESUAI FORMULIR -->
-    <div class="bill-card">
+        <div class="bill-card">
         <div class="bill-header">
             <h2>Rincian Program & Tagihan Pendaftaran</h2>
             <span class="badge-kelas {{ 'badge-inklusi' if (siswa and siswa['kelas'] == 'Inklusi') else '' }}">
@@ -230,8 +227,7 @@
         </div>
     </div>
 
-    <!-- FORM KONFIRMASI PEMBAYARAN -->
-    <div class="confirm-card">
+       <div class="confirm-card">
         <h2>Konfirmasi Pembayaran</h2>
         <form action="{{ url_for('pembayaran') }}" method="POST" enctype="multipart/form-data">
             <div class="form-group">

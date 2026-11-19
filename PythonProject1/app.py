@@ -11,6 +11,31 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 
 app = Flask(__name__)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
+
+@app.after_request
+def set_security_headers(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com data:; "
+        "img-src 'self' data: blob:; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "frame-ancestors 'none';"
+    )
+    return response
 
 # ================= SECRET KEY =================
 app.secret_key = 'secret123'
@@ -67,7 +92,6 @@ def init_db():
     conn = get_db()
     cur = conn.cursor()
 
-    # Tabel Users
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -80,7 +104,6 @@ def init_db():
         )
     """)
 
-    # Tabel Siswa
     cur.execute("""
         CREATE TABLE IF NOT EXISTS siswa (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,7 +131,6 @@ def init_db():
         )
     """)
 
-    # Migrasi kolom otomatis untuk database ppdb.db yang sudah ada
     kolom_siswa = [row[1] for row in cur.execute("PRAGMA table_info(siswa)").fetchall()]
     if 'email' not in kolom_siswa:
         cur.execute("ALTER TABLE siswa ADD COLUMN email TEXT")
@@ -119,7 +141,6 @@ def init_db():
     if 'kelas' not in kolom_siswa:
         cur.execute("ALTER TABLE siswa ADD COLUMN kelas TEXT DEFAULT 'Reguler'")
 
-    # Tabel Pembayaran PPDB
     cur.execute("""
         CREATE TABLE IF NOT EXISTS pembayaran (
             id_pembayaran INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,7 +173,6 @@ def init_db():
         )
     """)
 
-    # Buat akun admin default jika belum ada
     cur.execute("SELECT * FROM users WHERE role='admin'")
     if not cur.fetchone():
         cur.execute(
@@ -163,10 +183,8 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Jalankan inisialisasi tabel saat aplikasi dimuat
 init_db()
 
-# ================= LANDING PAGE / HOME =================
 @app.route('/')
 def home():
     sudah_bayar = False
@@ -187,7 +205,6 @@ def home():
 
     return render_template('landing.html', sudah_bayar=sudah_bayar)
 
-# ================= LOGIN =================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -222,7 +239,6 @@ def login():
 
     return render_template('login.html')
 
-# ================= DASHBOARD USER =================
 @app.route('/dashboard')
 def dashboard():
     if 'login' not in session:
@@ -265,7 +281,7 @@ def dashboard():
         pembayaran=data_bayar
     )
 
-# ================= HALAMAN TAGIHAN SPP BULANAN (USER) =================
+#HALAMAN TAGIHAN SPP BULANAN (USER) 
 @app.route('/tagihan_spp')
 def tagihan_spp():
     if 'login' not in session:
@@ -315,7 +331,6 @@ def tagihan_spp():
         riwayat_spp=riwayat_spp
     )
 
-# ================= UPLOAD PEMBAYARAN SPP BULANAN (USER) =================
 @app.route('/bayar_spp', methods=['POST'])
 def bayar_spp():
     if 'login' not in session:
@@ -356,7 +371,7 @@ def bayar_spp():
     flash(f"Bukti pembayaran SPP bulan {bulan} berhasil dikirim!")
     return redirect('/tagihan_spp')
 
-# ================= REGISTER (LANGKAH 1) =================
+#REGISTER (LANGKAH 1) 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -390,7 +405,7 @@ def register():
 
     return render_template('register.html')
 
-# ================= PENDAFTARAN FORMAL (LANGKAH 2) =================
+#PENDAFTARAN FORMAL (LANGKAH 2) 
 @app.route('/pendaftaran', methods=['GET', 'POST'])
 def pendaftaran():
     if 'login' not in session:
@@ -411,7 +426,6 @@ def pendaftaran():
         nama_ibu = request.form['nama_ibu']
         pekerjaan_ibu = request.form['pekerjaan_ibu']
 
-        # Tangkap pilihan program dari formulir
         jenjang = request.form.get('jenjang', 'Kinder A')
         tipe_program = request.form.get('tipe_program', 'Tatap Muka Rutin')
         kelas = request.form.get('kelas', 'Reguler')
@@ -456,7 +470,7 @@ def pendaftaran():
 
     return render_template('pendaftaran.html')
 
-# ================= PEMBAYARAN & PENINJAUAN (LANGKAH 3) =================
+#PEMBAYARAN & PENINJAUAN (LANGKAH 3)
 @app.route('/pembayaran', methods=['GET', 'POST'])
 def pembayaran():
     if 'login' not in session:
@@ -500,7 +514,6 @@ def pembayaran():
     conn.close()
     return render_template('bukti_pembayaran.html', siswa=siswa, rincian=rincian)
 
-# ================= STATUS PEMBAYARAN USER =================
 @app.route('/status_pembayaran')
 def status_pembayaran():
     if 'login' not in session:
@@ -536,7 +549,6 @@ def status_pembayaran():
 
     return render_template('status_pembayaran.html', status=status, id_siswa=id_siswa)
 
-# ================= DOWNLOAD SURAT PENERIMAAN UNTUK USER =================
 @app.route('/download_bukti_user/<id>')
 def download_bukti_user(id):
     if 'login' not in session:
@@ -544,7 +556,6 @@ def download_bukti_user(id):
 
     return cetak_bukti(id)
 
-# ================= PROFILE USER =================
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'login' not in session:
@@ -582,7 +593,7 @@ def profile():
     conn.close()
     return render_template('profile.html', user=user)
 
-# ================= DASHBOARD ADMIN =================
+#DASHBOARD ADMIN 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':
@@ -615,7 +626,7 @@ def admin_dashboard():
         total_spp=total_spp
     )
 
-# ================= DATA SISWA (ADMIN) =================
+#DATA SISWA (ADMIN) 
 @app.route('/data_siswa')
 def data_siswa():
     if session.get('role') != 'admin':
@@ -629,7 +640,7 @@ def data_siswa():
 
     return render_template('data_siswa.html', siswa=data)
 
-# ================= DETAIL SISWA (ADMIN) =================
+#DETAIL SISWA (ADMIN) 
 @app.route('/detail_siswa/<id>')
 def detail_siswa(id):
     if session.get('role') != 'admin':
@@ -646,7 +657,7 @@ def detail_siswa(id):
 
     return render_template('detail_siswa.html', siswa=siswa)
 
-# ================= EDIT SISWA (ADMIN) =================
+#EDIT SISWA (ADMIN)
 @app.route('/edit_siswa/<id>', methods=['GET', 'POST'])
 def edit_siswa(id):
     if session.get('role') != 'admin':
@@ -677,7 +688,7 @@ def edit_siswa(id):
 
     return render_template('edit_siswa.html', siswa=siswa)
 
-# ================= HAPUS SISWA (ADMIN) =================
+#HAPUS SISWA (ADMIN)
 @app.route('/hapus_siswa/<id>')
 def hapus_siswa(id):
     if session.get('role') != 'admin':
@@ -691,7 +702,7 @@ def hapus_siswa(id):
 
     return redirect('/data_siswa')
 
-# ================= DATA PEMBAYARAN PPDB (ADMIN) =================
+#DATA PEMBAYARAN PPDB (ADMIN)
 @app.route('/data_pembayaran')
 def data_pembayaran():
     if session.get('role') != 'admin':
@@ -709,7 +720,7 @@ def data_pembayaran():
 
     return render_template('data_pembayaran.html', pembayaran=data)
 
-# ================= VERIFIKASI PEMBAYARAN PPDB (ADMIN) =================
+#VERIFIKASI PEMBAYARAN PPDB (ADMIN)
 @app.route('/verifikasi/<id>/<status>')
 def verifikasi(id, status):
     if session.get('role') != 'admin':
@@ -745,7 +756,7 @@ def acc(id):
 
     return redirect(url_for('data_pembayaran'))
 
-# ================= DATA & VERIFIKASI SPP BULANAN (ADMIN) =================
+#DATA & VERIFIKASI SPP BULANAN (ADMIN)
 @app.route('/data_spp')
 def data_spp():
     if session.get('role') != 'admin':
@@ -772,7 +783,7 @@ def verifikasi_spp(id, status):
 
     return redirect('/data_spp')
 
-# ================= MANAGEMENT USER (ADMIN) =================
+#MANAGEMENT USER (ADMIN) 
 @app.route('/tambah', methods=['POST'])
 def tambah_user():
     if session.get('role') != 'admin':
@@ -809,7 +820,7 @@ def hapus_user(id):
 
     return redirect(url_for('admin_dashboard'))
 
-# ================= 1. REKAPITULASI DATA SISWA TAHUN AJARAN BARU =================
+#REKAPITULASI DATA SISWA TAHUN AJARAN BARU
 @app.route('/cetak_pdf')
 def cetak_pdf():
     if session.get('role') != 'admin':
@@ -910,7 +921,7 @@ def cetak_pdf():
     response.headers['Content-Disposition'] = 'inline; filename=rekapitulasi_siswa_tahun_ajaran_baru.pdf'
     return response
 
-# ================= SURAT PENERIMAAN INDIVIDUAL PER SISWA (PDF REPORTLAB) =================
+#SURAT PENERIMAAN INDIVIDUAL PER SISWA (PDF REPORTLAB)
 @app.route('/cetak_bukti/<id>')
 def cetak_bukti(id):
     if 'login' not in session:
@@ -1017,7 +1028,7 @@ def cetak_bukti(id):
     response.headers['Content-Disposition'] = f'inline; filename=Surat_Penerimaan_{siswa[0]}.pdf'
     return response
 
-# ================= LUPA & RESET PASSWORD =================
+#LUPA & RESET PASSWORD
 @app.route('/lupa_password', methods=['GET', 'POST'])
 def lupa_password():
     if request.method == 'POST':
@@ -1066,13 +1077,11 @@ def reset_password():
 
     return render_template('reset_password.html')
 
-# ================= LOGOUT =================
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
-# ================= RUN =================
 if __name__ == '__main__':
     app.run(
         host='0.0.0.0',

@@ -29,8 +29,7 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR */
-        .sidebar {
+               .sidebar {
             width: 265px;
             background: linear-gradient(180deg, #0277bd 0%, #01579b 100%);
             color: #ffffff;
@@ -74,8 +73,7 @@
             font-weight: 600;
         }
 
-        /* BAGIAN BAWAH SIDEBAR */
-        .sidebar-bottom {
+                .sidebar-bottom {
             margin-top: auto;
             display: flex;
             flex-direction: column;
@@ -130,7 +128,6 @@
             color: #ffffff;
         }
 
-        /* MAIN CONTENT */
         .main-content {
             flex: 1;
             padding: 36px 40px;
@@ -152,7 +149,6 @@
             font-size: 0.95rem;
         }
 
-        /* STATUS CARD */
         .status-card {
             background: #ffffff;
             border-radius: 20px;
@@ -206,7 +202,6 @@
             opacity: 0.9;
         }
 
-        /* SUMMARY GRID */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -244,7 +239,6 @@
 <body>
 
 <div class="dashboard-layout">
-    <!-- SIDEBAR NAVIGASI -->
     <aside class="sidebar">
         <div class="sidebar-brand">TK Tadika Puri</div>
         <ul class="sidebar-menu">
@@ -264,14 +258,12 @@
         </div>
     </aside>
 
-    <!-- KONTEN UTAMA DASHBOARD -->
     <main class="main-content">
         <div class="header-user">
             <h1>Selamat Datang, {{ nama }}!</h1>
             <p>Pantau perkembangan proses pendaftaran PPDB putra/putri Anda di sini.</p>
         </div>
 
-        <!-- STATUS PENDAFTARAN SAAT INI -->
         <div class="status-card">
             <div class="status-header">Status Pendaftaran & Pembayaran</div>
             {% if status == 'Lunas' %}
@@ -301,7 +293,6 @@
             {% endif %}
         </div>
 
-        <!-- RINGKASAN INFORMASI PENDAFTAR -->
         <div class="info-grid">
             <div class="info-box">
                 <h3>Email Terdaftar</h3>
